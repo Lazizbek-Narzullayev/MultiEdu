@@ -1,0 +1,314 @@
+{
+    "Courses": {
+        "Marketing": [
+            {
+                "title": "Digital Marketing Fundamentals",
+                "lessons": 18,
+                "level": "Beginner",
+                "rating": 4.6, 
+                "reviews": "4.5k",
+                "instructor": "Sophia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 199,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/marketing-course-image-01.jpg"
+            },
+            {
+                "title": "SEO Mastery Course",
+                "lessons": 22,
+                "level": "Intermediate",
+                "rating": 4.8,
+                "reviews": "6.3k",
+                "instructor": "David",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 249,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/marketing-course-image-02.jpg"
+            },
+            {
+                "title": "Social Media Marketing Strategy",
+                "lessons": 20,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "5.8k",
+                "instructor": "Emily",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 179,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/marketing-course-image-03.jpg"
+            },
+            {
+                "title": "Google Ads & PPC Training",
+                "lessons": 25,
+                "level": "Advanced",
+                "rating": 4.9,
+                "reviews": "3.2k",
+                "instructor": "Michael",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 299,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/marketing-course-image-04.jpg"
+            },
+            {
+                "title": "Content Marketing & Blogging",
+                "lessons": 15,
+                "level": "Beginner",
+                "rating": 4.5,
+                "reviews": "2.9k",
+                "instructor": "Anika",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 159,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/marketing-course-image-05.jpg"
+            }
+        ],
+        "Academic": [
+            {
+                "title": "Introduction to Digital Marketing",
+                "lessons": 20,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "6.4k",
+                "instructor": "AnikaZ",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 148,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/academic-course-image-01.jpg"
+            },
+            {
+                "title": "Business Communication Skills",
+                "lessons": 18,
+                "level": "Intermediate",
+                "rating": 4.6,
+                "reviews": "4.8k",
+                "instructor": "James",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 199,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/academic-course-image-02.jpg"
+            },
+            {
+                "title": "Research & Writing Skills",
+                "lessons": 14,
+                "level": "Beginner",
+                "rating": 4.5,
+                "reviews": "3.1k",
+                "instructor": "Sophia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 129,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/academic-course-image-03.jpg"
+            },
+            {
+                "title": "Critical Thinking & Problem Solving",
+                "lessons": 21,
+                "level": "Intermediate",
+                "rating": 4.8,
+                "reviews": "5.2k",
+                "instructor": "Ethan",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 179,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/academic-course-image-04.jpg"
+            },
+            {
+                "title": "Public Speaking & Presentation",
+                "lessons": 16,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "2.4k",
+                "instructor": "Olivia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 139,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/academic-course-image-05.jpg"
+            }
+        ],
+        "WebDesign": [
+            {
+                "title": "HTML & CSS Crash Course",
+                "lessons": 16,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "5.6k",
+                "instructor": "Daniel",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 199,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/webdesign-course-image-01.jpg"
+            },
+            {
+                "title": "Responsive Web Design",
+                "lessons": 22,
+                "level": "Intermediate",
+                "rating": 4.8,
+                "reviews": "7.3k",
+                "instructor": "Sophia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 249,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/webdesign-course-image-02.jpg"
+            },
+            {
+                "title": "JavaScript for Web Designers",
+                "lessons": 18,
+                "level": "Intermediate",
+                "rating": 4.6,
+                "reviews": "4.1k",
+                "instructor": "Michael",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 229,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/webdesign-course-image-03.jpg"
+            },
+            {
+                "title": "UI/UX Design Basics",
+                "lessons": 20,
+                "level": "Beginner",
+                "rating": 4.9,
+                "reviews": "6.7k",
+                "instructor": "Emily",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 299,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/webdesign-course-image-04.jpg"
+            },
+            {
+                "title": "Web Accessibility & Standards",
+                "lessons": 14,
+                "level": "Intermediate",
+                "rating": 4.5,
+                "reviews": "2.6k",
+                "instructor": "Liam",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 179,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/webdesign-course-image-05.jpg"
+            }
+        ],
+        "Programming": [
+            {
+                "title": "Introduction to Python Programming",
+                "lessons": 20,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "6.4k",
+                "instructor": "Wade",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 499,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/programming-course-image-01.jpg"
+            },
+            {
+                "title": "Java for Beginners",
+                "lessons": 25,
+                "level": "Beginner",
+                "rating": 4.8,
+                "reviews": "7.2k",
+                "instructor": "Sophia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 399,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/programming-course-image-02.jpg"
+            },
+            {
+                "title": "C++ Programming Essentials",
+                "lessons": 18,
+                "level": "Intermediate",
+                "rating": 4.6,
+                "reviews": "5.3k",
+                "instructor": "Michael",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 349,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/programming-course-image-03.jpg"
+            },
+            {
+                "title": "JavaScript Full Course",
+                "lessons": 30,
+                "level": "Intermediate",
+                "rating": 4.9,
+                "reviews": "8.1k",
+                "instructor": "Emily",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 599,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/programming-course-image-04.jpg"
+            },
+            {
+                "title": "Data Structures & Algorithms",
+                "lessons": 28,
+                "level": "Advanced",
+                "rating": 4.8,
+                "reviews": "9.4k",
+                "instructor": "Ethan",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 699,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/programming-course-image-05.jpg"
+            }
+        ],
+        "Design": [
+            {
+                "title": "Introduction to Photography Masterclass",
+                "lessons": 20,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "3.5k",
+                "instructor": "Sophia",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 457,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/design-course-image-01.jpg"
+            },
+            {
+                "title": "Graphic Design Fundamentals",
+                "lessons": 22,
+                "level": "Beginner",
+                "rating": 4.8,
+                "reviews": "6.9k",
+                "instructor": "Daniel",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 299,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/design-course-image-02.jpg"
+            },
+            {
+                "title": "Adobe Photoshop Mastery",
+                "lessons": 18,
+                "level": "Intermediate",
+                "rating": 4.6,
+                "reviews": "5.2k",
+                "instructor": "Michael",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 399,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/design-course-image-03.jpg"
+            },
+            {
+                "title": "Illustrator & Logo Design",
+                "lessons": 20,
+                "level": "Intermediate",
+                "rating": 4.9,
+                "reviews": "7.1k",
+                "instructor": "Emily",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 449,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/design-course-image-04.png"
+            },
+            {
+                "title": "3D Modeling for Beginners",
+                "lessons": 24,
+                "level": "Beginner",
+                "rating": 4.7,
+                "reviews": "4.6k",
+                "instructor": "Liam",
+                "InstructorImage": "Images/course-user.jpg",
+                "price": 499,
+                "enrollLink": "Enroll Now",
+                "CourseImage": "Images/design-course-image-05.jpg"
+            }
+        ]
+    }
+}

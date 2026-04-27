@@ -1,0 +1,27 @@
+const mongoose = require('mongoose');
+
+const LessonProgressSchema = new mongoose.Schema({
+    student: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    lesson: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lesson',
+        required: true
+    },
+    course: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course'
+    },
+    viewedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Student can only have one progress record per lesson
+LessonProgressSchema.index({ student: 1, lesson: 1 }, { unique: true });
+
+module.exports = mongoose.model('LessonProgress', LessonProgressSchema);
