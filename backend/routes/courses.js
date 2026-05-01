@@ -3,6 +3,8 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
+const User = require('../models/User');
+const QuizResult = require('../models/QuizResult');
 const crypto = require('crypto');
 
 // @route   POST api/courses
@@ -309,6 +311,194 @@ router.get('/teacher/detailed-stats', auth, async (req, res) => {
 });
 
 
+// @route   GET api/courses/admin/official-stats
+// @desc    Get detailed stats for official courses (lesson distribution & quiz performance)
+// @access  Private (Super Admin)
+router.get('/admin/official-stats', auth, async (req, res) => {
+    try {
+        if (req.user.role !== 'super-admin') {
+            return res.status(403).json({ msg: 'Ruxsat yo\'q' });
+        }
+
+        const LessonProgress = require('../models/LessonProgress');
+        const QuizResult = require('../models/QuizResult');
+        const Lesson = require('../models/Lesson');
+
+        // 1. Get all independent lessons (official library)
+        const lessons = await Lesson.find({ course: null }).populate('instructor', 'name email');
+
+        const stats = await Promise.all(lessons.map(async (lesson) => {
+            const studentProgress = await LessonProgress.find({ lesson: lesson._id }).populate('student', 'name email');
+            const studentCount = studentProgress.length;
+            
+            const results = await QuizResult.find({ lesson: lesson._id }).populate('student', 'name email');
+            let avgScore = 0;
+            if (results.length > 0) {
+                avgScore = Math.round(results.reduce((acc, r) => acc + (r.score || 0), 0) / results.length);
+            }
+
+            // Map students to their results
+            const studentDetails = studentProgress.map(p => {
+                const quiz = results.find(r => r.student?._id.toString() === p.student?._id.toString());
+                return {
+                    _id: p.student?._id,
+                    name: p.student?.name || 'Noma\'lum',
+                    email: p.student?.email,
+                    viewedAt: p.createdAt,
+                    quizScore: quiz ? quiz.score : null,
+                    status: quiz ? 'completed' : 'viewed'
+                };
+            });
+
+            return {
+                _id: lesson._id,
+                title: lesson.title,
+                teacher: lesson.instructor?.name || 'MultiEdu Academy',
+                studentCount,
+                avgScore,
+                date: lesson.date,
+                studentDetails
+            };
+        }));
+
+        res.json(stats);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server xatosi' });
+    }
+});
+
+// @route   GET api/courses/admin/teacher-stats
+// @desc    Get detailed stats for all teacher-created courses
+// @access  Private (Super Admin)
+router.get('/admin/teacher-stats', auth, async (req, res) => {
+    try {
+        if (req.user.role !== 'super-admin') {
+            return res.status(403).json({ msg: 'Ruxsat yo\'q' });
+        }
+
+        const LessonProgress = require('../models/LessonProgress');
+        const Submission = require('../models/Submission');
+
+        // Get ALL courses for super admin monitoring
+        const courses = await Course.find().populate('teacher', 'name email');
+        console.log(`Super Admin found ${courses.length} total courses for monitoring`);
+
+        const stats = await Promise.all(courses.map(async (course) => {
+            const lessons = await Lesson.find({ course: course._id });
+            console.log(`Course "${course.title}" has ${lessons.length} lessons`);
+            
+            const courseId = course._id;
+            
+            // Get all students enrolled in this course
+            const enrolledStudents = await User.find({ _id: { $in: course.students } }).select('name email');
+            console.log(`Course "${course.title}" has ${enrolledStudents.length} students`);
+
+            // Get stats for each student
+            const studentDetails = await Promise.all(enrolledStudents.map(async (student) => {
+                const viewedLessons = await LessonProgress.countDocuments({ 
+                    student: student._id, 
+                    lesson: { $in: lessons.map(l => l._id) } 
+                });
+                
+                const quizResults = await QuizResult.find({ 
+                    student: student._id, 
+                    lesson: { $in: lessons.map(l => l._id) } 
+                });
+                
+                const avgQuiz = quizResults.length > 0 
+                    ? Math.round(quizResults.reduce((acc, r) => acc + r.score, 0) / quizResults.length)
+                    : 0;
+
+                const submissions = await Submission.find({ 
+                    studentId: student._id, 
+                    courseId: courseId,
+                    status: 'graded'
+                }).populate('assignmentId', 'maxScore');
+
+                const avgAssignment = submissions.length > 0
+                    ? Math.round(submissions.reduce((acc, s) => {
+                        const max = s.assignmentId?.maxScore || 100;
+                        return acc + (s.score / max * 100);
+                    }, 0) / submissions.length)
+                    : 0;
+
+                const progressValue = lessons.length > 0 ? Math.round((viewedLessons / lessons.length) * 100) : 0;
+                
+                // Overall mastery calculation (average of progress, quiz, and assignments)
+                const components = [progressValue];
+                let divisor = 1;
+                
+                if (avgQuiz > 0 || quizResults.length > 0) {
+                    components.push(avgQuiz);
+                    divisor++;
+                }
+                if (avgAssignment > 0 || submissions.length > 0) {
+                    components.push(avgAssignment);
+                    divisor++;
+                }
+                
+                const overall = Math.round(components.reduce((a, b) => a + b, 0) / divisor);
+                
+                console.log(`Student ${student.name}: Progress ${progressValue}%, Quiz ${avgQuiz}%, Sub ${avgAssignment}%, Overall ${overall}%`);
+
+                return {
+                    _id: student._id,
+                    name: student.name,
+                    email: student.email,
+                    progress: progressValue,
+                    avgQuiz,
+                    avgAssignment,
+                    overall
+                };
+            }));
+
+            // Get view counts for each lesson
+            const lessonsWithStats = await Promise.all(lessons.map(async (lesson) => {
+                const viewCount = await LessonProgress.countDocuments({ lesson: lesson._id });
+                return { _id: lesson._id, title: lesson.title, viewCount };
+            }));
+
+            // Get average mastery
+            const courseMastery = studentDetails.length > 0
+                ? Math.round(studentDetails.reduce((acc, s) => acc + s.overall, 0) / studentDetails.length)
+                : 0;
+
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            
+            const newStudentsCount = await User.countDocuments({ 
+                _id: { $in: course.students }, 
+                date: { $gt: lastWeek } 
+            });
+
+            const pendingSubmissions = await Submission.countDocuments({
+                courseId: course._id,
+                status: 'pending'
+            });
+
+            return {
+                _id: course._id,
+                title: course.title,
+                teacher: course.teacher?.name || 'Noma\'lum',
+                studentCount: course.students?.length || 0,
+                newStudents: newStudentsCount,
+                pendingSubmissions: pendingSubmissions,
+                averageMastery: courseMastery,
+                totalLessons: lessons.length,
+                lessons: lessonsWithStats,
+                studentDetails,
+                createdAt: course.createdAt
+            };
+        }));
+
+        res.json(stats);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server xatosi' });
+    }
+});
+
 // @route   GET api/courses/teacher/recent-activity
 // @desc    Get recent activities in teacher's courses
 // @access  Private (Teacher)
@@ -359,6 +549,35 @@ router.get('/teacher/recent-activity', auth, async (req, res) => {
         activities.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         res.json(activities.slice(0, limit));
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server xatosi', error: err.message });
+    }
+});
+
+// @route   DELETE api/courses/:id
+// @desc    Delete a course
+// @access  Private (Teacher who owns the course or Super Admin)
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const course = await Course.findById(req.params.id);
+
+        if (!course) {
+            return res.status(404).json({ msg: 'Kurs topilmadi' });
+        }
+
+        // Only the teacher who created it can delete it, or Super Admin
+        if (course.teacher.toString() !== req.user.id && req.user.role !== 'super-admin') {
+            return res.status(403).json({ msg: 'Sizda ushbu kursni o\'chirish huquqi yo\'q' });
+        }
+
+        await Course.findByIdAndDelete(req.params.id);
+
+        // Optionally delete associated lessons or handle them (here we just delete the course)
+        // In a production app, you might want to delete lessons, quizzes, etc.
+        // For now, let's just delete the course.
+        
+        res.json({ msg: 'Kurs muvaffaqiyatli o\'chirildi' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server xatosi', error: err.message });

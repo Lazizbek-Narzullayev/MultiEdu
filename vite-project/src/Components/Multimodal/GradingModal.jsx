@@ -162,7 +162,10 @@ const GradingModal = ({ open, onClose, assignment }) => {
                                                     label="Baho"
                                                     type="number"
                                                     size="small"
-                                                    sx={{ width: 100 }}
+                                                    sx={{ 
+                                                        width: 100,
+                                                        '& .MuiOutlinedInput-root': { borderRadius: 3 }
+                                                    }}
                                                     value={currentScore}
                                                     onChange={(e) => handleScoreChange(sub._id, e.target.value)}
                                                 />
@@ -170,6 +173,7 @@ const GradingModal = ({ open, onClose, assignment }) => {
                                                     label="Izoh yozish (Feedback)"
                                                     fullWidth
                                                     size="small"
+                                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                                                     value={currentFeedback}
                                                     onChange={(e) => handleFeedbackChange(sub._id, e.target.value)}
                                                 />
@@ -177,7 +181,14 @@ const GradingModal = ({ open, onClose, assignment }) => {
                                                     variant="contained"
                                                     color="primary"
                                                     onClick={() => handleSaveGrade(sub._id)}
-                                                    sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                                                    sx={{ 
+                                                        textTransform: 'none', 
+                                                        fontWeight: 'black',
+                                                        borderRadius: 3,
+                                                        px: 4,
+                                                        height: 40,
+                                                        boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)'
+                                                    }}
                                                 >
                                                     Saqlash
                                                 </Button>

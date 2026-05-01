@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Info, 
@@ -21,7 +21,7 @@ import {
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-import { addLesson } from '../../store/Slice/lessonSlice';
+import { addLesson, fetchLessonById, updateLesson } from '../../store/Slice/lessonSlice';
 import { API_BASE_URL } from '../../config/apiConfig';
 import Library3D from './Library3D';
 import ModelViewer from './ModelViewer';
@@ -31,12 +31,24 @@ import { Badge } from '@/Components/ui/badge';
 import { Progress } from '@/Components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 
+const TabWrapper = ({ children }) => (
+    <motion.div 
+        initial={{ opacity: 0, y: 10 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="space-y-8 pt-6"
+    >
+        {children}
+    </motion.div>
+);
+
 const LessonForm = ({ courseId = null, onComplete = null }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading } = useSelector((state) => state.lessons);
     const { user } = useSelector((state) => state.auth);
 
+    const { id } = useParams();
+    const isEdit = !!id;
     const [activeTab, setActiveTab] = useState("general");
     const [selected3DModel, setSelected3DModel] = useState(null);
 
@@ -61,6 +73,27 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
         document: 0,
         thumbnail: 0
     });
+
+    React.useEffect(() => {
+        if (isEdit) {
+            dispatch(fetchLessonById(id)).unwrap().then(lesson => {
+                setFormData({
+                    title: lesson.title || '',
+                    description: lesson.description || '',
+                    textContent: lesson.textContent || '',
+                    videoUrl: lesson.videoUrl || '',
+                    audioUrl: lesson.audioUrl || '',
+                    interactiveUrl: lesson.interactiveUrl || '',
+                    documentUrl: lesson.documentUrl || '',
+                    thumbnailUrl: lesson.thumbnailUrl || '',
+                    category: lesson.category || 'Umumiy',
+                    courseId: lesson.course || courseId,
+                    transcript: lesson.transcript || ''
+                });
+                setQuiz(lesson.quiz || []);
+            });
+        }
+    }, [id, isEdit, dispatch, courseId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -120,33 +153,41 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
             return;
         }
 
-        const action = await dispatch(addLesson({ ...formData, quiz }));
-        if (addLesson.fulfilled.match(action)) {
-            Swal.fire({ icon: 'success', title: 'Dars yaratildi', timer: 1500, showConfirmButton: false });
+        const lessonData = { ...formData, quiz };
+        let action;
+        
+        if (isEdit) {
+            action = await dispatch(updateLesson({ id, lessonData }));
+        } else {
+            action = await dispatch(addLesson(lessonData));
+        }
+
+        if (isEdit ? updateLesson.fulfilled.match(action) : addLesson.fulfilled.match(action)) {
+            Swal.fire({ 
+                icon: 'success', 
+                title: isEdit ? 'Dars yangilandi' : 'Dars yaratildi', 
+                timer: 1500, 
+                showConfirmButton: false 
+            });
             if (onComplete) onComplete(action.payload);
-            else navigate(courseId ? `/courses/${courseId}` : '/lessons');
+            else navigate(courseId || formData.courseId ? `/courses/${courseId || formData.courseId}` : '/lessons');
         }
     };
 
-    const TabWrapper = ({ children }) => (
-        <motion.div 
-            initial={{ opacity: 0, y: 10 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="space-y-8 pt-6"
-        >
-            {children}
-        </motion.div>
-    );
 
     const formUI = (
-        <div className="max-w-5xl mx-auto py-10 px-4">
-            <div className="bg-card border border-border rounded-[3rem] shadow-2xl overflow-hidden">
-                <div className="p-8 md:p-12 border-b border-border bg-muted/20">
-                    <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">Yangi Dars Yarating</h1>
-                    <p className="text-muted-foreground font-medium">Interaktiv, multimodal va AI bilan boyitilgan ta'lim tajribasi</p>
+        <div className="max-w-4xl mx-auto py-6 px-4">
+            <div className="bg-card border border-border rounded-[2rem] shadow-2xl overflow-hidden">
+                <div className="p-6 md:p-8 border-b border-border bg-muted/20">
+                    <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">
+                        {isEdit ? 'Darsni Tahrirlang' : 'Yangi Dars Yarating'}
+                    </h1>
+                    <p className="text-muted-foreground font-medium">
+                        {isEdit ? 'Mavjud dars ma\'lumotlarini yangilash' : 'Interaktiv, multimodal va AI bilan boyitilgan ta\'lim tajribasi'}
+                    </p>
                 </div>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="p-8 md:p-12">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6 md:p-8">
                     <TabsList className="bg-muted/50 p-1 rounded-2xl w-full justify-start overflow-x-auto no-scrollbar">
                         <TabsTrigger value="general" className="rounded-xl px-6 font-bold"><Info className="w-4 h-4 mr-2" /> Asosiy</TabsTrigger>
                         <TabsTrigger value="media" className="rounded-xl px-6 font-bold"><Video className="w-4 h-4 mr-2" /> Media</TabsTrigger>
@@ -364,7 +405,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                                 </div>
                                                 <div className="grid md:grid-cols-2 gap-4">
                                                     {q.options.map((opt, oIdx) => (
-                                                        <div key={oIdx} className="flex items-center gap-3 p-3 bg-background rounded-2xl border border-border">
+                                                        <div key={`q-${idx}-opt-${oIdx}`} className="flex items-center gap-3 p-3 bg-background rounded-2xl border border-border">
                                                             <input 
                                                                 type="radio" name={`q-${idx}`} checked={q.correctAnswer === oIdx}
                                                                 onChange={() => { const n = [...quiz]; n[idx].correctAnswer = oIdx; setQuiz(n); }}
@@ -390,13 +431,13 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                     </TabsContent>
                 </Tabs>
 
-                <div className="p-8 md:p-12 bg-muted/20 border-t border-border flex justify-end gap-4">
+                <div className="p-6 md:p-8 bg-muted/20 border-t border-border flex justify-end gap-4">
                     <Button variant="ghost" className="rounded-2xl px-10 font-bold" onClick={() => navigate(-1)}>Bekor qilish</Button>
                     <Button 
                         size="lg" className="rounded-[1.5rem] px-12 font-black text-lg bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20"
                         onClick={handleSubmit} disabled={loading}
                     >
-                        {loading ? 'Saqlanmoqda...' : <><Save className="w-5 h-5 mr-3" /> Darsni Saqlash</>}
+                        {loading ? 'Saqlanmoqda...' : <><Save className="w-5 h-5 mr-3" /> {isEdit ? 'Darsni Yangilash' : 'Darsni Saqlash'}</>}
                     </Button>
                 </div>
             </div>

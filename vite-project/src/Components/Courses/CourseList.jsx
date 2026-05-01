@@ -132,7 +132,7 @@ const CourseList = () => {
                     </div>
                 </div>
 
-                <div className="p-6 flex-1 flex flex-col">
+                <div className="p-6 flex-1 flex flex-col cursor-pointer" onClick={() => navigate(`/courses/${course._id}`)}>
                     <div className="flex-1">
                         <h3 className="text-[1.1rem] font-black text-[#0f172a] leading-tight group-hover:text-primary transition-colors line-clamp-2 h-[2.8rem] mb-2">
                             {course.title}
@@ -154,7 +154,7 @@ const CourseList = () => {
                         <Button 
                             variant="ghost"
                             className="h-9 px-4 rounded-xl text-primary font-black gap-2 hover:bg-primary/5 text-[0.85rem]"
-                            onClick={() => navigate(`/courses/${course._id}`)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course._id}`); }}
                         >
                             Kirish
                             <ArrowRight className="w-4 h-4" />
@@ -244,19 +244,12 @@ const CourseList = () => {
                         <div className="h-10 w-px bg-slate-100 hidden md:block" />
                         
                         <div className="flex items-center gap-4 px-2 w-full md:w-auto">
-                            {user?.role === 'super-admin' ? (
-                                <Tabs value={activeTab} onValueChange={setActiveTab} className="bg-slate-50 p-1 rounded-xl">
-                                    <TabsList className="bg-transparent h-10 gap-1">
-                                        <TabsTrigger value="official" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Rasmiy</TabsTrigger>
-                                        <TabsTrigger value="classroom" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Sinfxonalar</TabsTrigger>
-                                    </TabsList>
-                                </Tabs>
-                            ) : (
-                                <div className="flex items-center gap-2 text-slate-400 font-black uppercase text-[10px] tracking-widest px-4">
-                                    <Filter className="w-4 h-4" />
-                                    Filterlar
-                                </div>
-                            )}
+                            <Tabs value={activeTab} onValueChange={setActiveTab} className="bg-slate-50 p-1 rounded-xl">
+                                <TabsList className="bg-transparent h-10 gap-1">
+                                    <TabsTrigger value="official" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Rasmiy</TabsTrigger>
+                                    <TabsTrigger value="classroom" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Sinfxonalar</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
                         </div>
                     </motion.div>
 

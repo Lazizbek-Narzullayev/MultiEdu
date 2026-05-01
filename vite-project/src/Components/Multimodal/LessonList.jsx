@@ -128,11 +128,11 @@ const LessonList = () => {
                 {/* Hero Header Section */}
                 <Box sx={{ 
                     position: 'relative', 
-                    mb: 8, 
+                    mb: 4, 
                     overflow: 'hidden',
                     background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                    pt: 10,
-                    pb: 12,
+                    pt: 6,
+                    pb: 10,
                     color: 'white'
                 }}>
                     <Box sx={{ 
@@ -145,7 +145,7 @@ const LessonList = () => {
                         borderRadius: '50%'
                     }} />
                     
-                    <Container maxWidth="lg">
+                    <Box sx={{ maxWidth: '1000px', ml: 0, px: { xs: 2, md: 6 } }}>
                         <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={4}>
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
@@ -158,7 +158,7 @@ const LessonList = () => {
                                         Platforma resurslari
                                     </Typography>
                                 </Stack>
-                                <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, letterSpacing: -1, fontSize: { xs: '2.5rem', md: '3.75rem' } }}>
+                                <Typography variant="h2" sx={{ fontWeight: 900, mb: 1, letterSpacing: -1, fontSize: { xs: '2rem', md: '2.8rem' } }}>
                                     Darslar va <span style={{ color: '#00A5C4' }}>resurslar</span>
                                 </Typography>
                                 <Typography sx={{ color: '#94a3b8', fontSize: '1.1rem', maxWidth: 600, fontWeight: 500 }}>
@@ -173,15 +173,15 @@ const LessonList = () => {
                                         startIcon={<AddCircleOutlineIcon />}
                                         onClick={() => navigate('/lessons/add')}
                                         sx={{ 
-                                            borderRadius: '20px', 
-                                            px: 6, 
-                                            py: 2.5, 
+                                            borderRadius: '16px', 
+                                            px: 4, 
+                                            py: 1.8, 
                                             fontWeight: 900, 
                                             textTransform: 'none', 
                                             bgcolor: '#00A5C4',
-                                            fontSize: '1.05rem',
-                                            boxShadow: '0 20px 40px rgba(0, 165, 196, 0.25)',
-                                            '&:hover': { bgcolor: '#008ba5', transform: 'translateY(-3px)' },
+                                            fontSize: '0.95rem',
+                                            boxShadow: '0 15px 30px rgba(0, 165, 196, 0.2)',
+                                            '&:hover': { bgcolor: '#008ba5', transform: 'translateY(-2px)' },
                                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                                         }}
                                     >
@@ -190,21 +190,21 @@ const LessonList = () => {
                                 </motion.div>
                             )}
                         </Stack>
-                    </Container>
+                    </Box>
                 </Box>
 
-                <Container maxWidth="lg">
+                <Box sx={{ maxWidth: '1000px', ml: 0, px: { xs: 2, md: 6 } }}>
                     {/* Search & Filter Bar */}
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                         <Paper elevation={0} sx={{ 
-                            p: 1.5, 
-                            mb: 8, 
-                            mt: -14,
-                            borderRadius: '24px', 
+                            p: 1, 
+                            mb: 6, 
+                            mt: -10,
+                            borderRadius: '20px', 
                             bgcolor: 'white', 
                             display: 'flex', 
                             alignItems: 'center', 
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
+                            boxShadow: '0 15px 40px rgba(0,0,0,0.06)',
                             border: '1px solid #f1f5f9',
                             zIndex: 10,
                             position: 'relative'
@@ -266,11 +266,13 @@ const LessonList = () => {
                                                     boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
                                                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': { 
-                                                        transform: isLocked ? 'none' : 'translateY(-12px)', 
-                                                        boxShadow: isLocked ? 'none' : '0 30px 60px rgba(0, 165, 196, 0.12)',
+                                                        transform: isLocked ? 'none' : 'translateY(-8px)', 
+                                                        boxShadow: isLocked ? 'none' : '0 20px 40px rgba(0, 165, 196, 0.1)',
                                                         borderColor: isLocked ? '#f1f5f9' : '#00A5C4'
                                                     },
-                                                    position: 'relative'
+                                                    position: 'relative',
+                                                    maxWidth: 320,
+                                                    mx: 'auto'
                                                 }}>
                                                     {/* Admin Actions */}
                                                     {(user?.role === 'super-admin' || user?.role === 'admin') && (
@@ -288,7 +290,7 @@ const LessonList = () => {
                                                         </IconButton>
                                                     )}
 
-                                                    <Box sx={{ position: 'relative', pt: '56.25%', overflow: 'hidden' }}>
+                                                    <Box sx={{ position: 'relative', pt: '50%', overflow: 'hidden' }}>
                                                         <CardMedia
                                                             component="img"
                                                             image={getThumbnail(lesson)}
@@ -329,14 +331,14 @@ const LessonList = () => {
                                                         </Box>
                                                     </Box>
 
-                                                    <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                                    <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                                                         <Typography variant="h6" sx={{ 
                                                             fontWeight: 900, 
                                                             mb: 1, 
                                                             color: '#0f172a', 
-                                                            lineHeight: 1.3, 
-                                                            height: '2.8rem',
-                                                            fontSize: '1.05rem',
+                                                            lineHeight: 1.2, 
+                                                            height: '2.4rem',
+                                                            fontSize: '0.9rem',
                                                             display: '-webkit-box',
                                                             WebkitLineClamp: 2,
                                                             WebkitBoxOrient: 'vertical',
@@ -373,14 +375,14 @@ const LessonList = () => {
                                                                 onClick={() => navigate(`/lessons/${lesson._id}`)}
                                                                 startIcon={isLocked ? <LockIcon sx={{ fontSize: 16 }} /> : <PlayArrowIcon sx={{ fontSize: 18 }} />}
                                                                 sx={{
-                                                                    borderRadius: '12px',
-                                                                    py: 1.2,
-                                                                    fontWeight: 900,
+                                                                    borderRadius: '10px',
+                                                                    py: 0.8,
+                                                                    fontWeight: 800,
                                                                     textTransform: 'none',
-                                                                    fontSize: '0.85rem',
+                                                                    fontSize: '0.8rem',
                                                                     bgcolor: isLocked ? '#e2e8f0' : '#00A5C4',
-                                                                    boxShadow: isLocked ? 'none' : '0 8px 16px rgba(0, 165, 196, 0.12)',
-                                                                    '&:hover': { bgcolor: '#008ba5', boxShadow: '0 12px 24px rgba(0, 165, 196, 0.2)' },
+                                                                    boxShadow: isLocked ? 'none' : '0 6px 12px rgba(0, 165, 196, 0.1)',
+                                                                    '&:hover': { bgcolor: '#008ba5', boxShadow: '0 10px 20px rgba(0, 165, 196, 0.15)' },
                                                                     '&.Mui-disabled': { bgcolor: '#f1f5f9', color: '#94a3b8' }
                                                                 }}
                                                             >
@@ -407,7 +409,7 @@ const LessonList = () => {
                             </Typography>
                         </Box>
                     )}
-                </Container>
+                </Box>
 
                 {/* Admin Actions Menu */}
                 <Menu

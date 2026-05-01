@@ -18,6 +18,13 @@ router.get('/system-stats', auth, roleCheck(['super-admin']), async (req, res) =
         const totalStudents = await User.countDocuments({ role: 'student' });
         const totalCourses = await Course.countDocuments();
 
+        const lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        
+        const newStudents = await User.countDocuments({ role: 'student', date: { $gt: lastWeek } });
+        const newTeachers = await User.countDocuments({ role: 'teacher', date: { $gt: lastWeek } });
+        const newCourses = await Course.countDocuments({ createdAt: { $gt: lastWeek } });
+
         // 2. Get all teachers with their stats
         const teachers = await User.find({ role: 'teacher' }).select('name email avatar');
 
@@ -77,7 +84,11 @@ router.get('/system-stats', auth, roleCheck(['super-admin']), async (req, res) =
                 totalTeachers,
                 totalStudents,
                 totalCourses,
-                averageMastery: globalAverageMastery
+                averageMastery: globalAverageMastery,
+                newStudents,
+                newTeachers,
+                newCourses,
+                studentGrowth: totalStudents > 0 ? Math.round((newStudents / totalStudents) * 100) : 0
             },
             teacherStats
         });

@@ -9,6 +9,8 @@ const initialState = {
     detailedStats: [],
     studentStats: { completedTopics: 0, completedAssignments: 0, timeSpent: 0, lastLesson: null },
     studentProgress: [],
+    officialStats: [],
+    teacherClassesStats: [],
     loading: false,
     error: null,
 };
@@ -130,6 +132,45 @@ export const updateCourse = createAsyncThunk('courses/update', async ({ id, cour
     }
 });
 
+// Delete a course (Teacher / Super Admin)
+export const deleteCourse = createAsyncThunk('courses/delete', async (id, { getState, rejectWithValue }) => {
+    try {
+        const { auth } = getState();
+        const res = await axios.delete(`${API_BASE_URL}/courses/${id}`, {
+            headers: { 'x-auth-token': auth.user.token }
+        });
+        return { id, msg: res.data.msg };
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.msg || 'Xatolik');
+    }
+});
+
+// Get official course stats (Super Admin)
+export const getOfficialStats = createAsyncThunk('courses/getOfficialStats', async (_, { getState, rejectWithValue }) => {
+    try {
+        const { auth } = getState();
+        const res = await axios.get(`${API_BASE_URL}/courses/admin/official-stats`, {
+            headers: { 'x-auth-token': auth.user.token }
+        });
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.msg || 'Xatolik');
+    }
+});
+
+// Get all teacher courses stats (Super Admin)
+export const getTeacherClassesStats = createAsyncThunk('courses/getTeacherClassesStats', async (_, { getState, rejectWithValue }) => {
+    try {
+        const { auth } = getState();
+        const res = await axios.get(`${API_BASE_URL}/courses/admin/teacher-stats`, {
+            headers: { 'x-auth-token': auth.user.token }
+        });
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.msg || 'Xatolik');
+    }
+});
+
 const courseSlice = createSlice({
     name: 'courses',
     initialState,
@@ -167,10 +208,17 @@ const courseSlice = createSlice({
                 state.error = action.payload;
             })
             // Get By ID
+            .addCase(getCourseById.pending, (state) => {
+                state.loading = true;
+                state.currentCourse = null;
+                state.error = null;
+            })
             .addCase(getCourseById.fulfilled, (state, action) => {
+                state.loading = false;
                 state.currentCourse = action.payload;
             })
             .addCase(getCourseById.rejected, (state, action) => {
+                state.loading = false;
                 state.error = action.payload;
             })
             // Update
@@ -179,6 +227,13 @@ const courseSlice = createSlice({
                 const index = state.courses.findIndex(c => c._id === action.payload._id);
                 if (index !== -1) {
                     state.courses[index] = action.payload;
+                }
+            })
+            // Delete
+            .addCase(deleteCourse.fulfilled, (state, action) => {
+                state.courses = state.courses.filter(c => c._id !== action.payload.id);
+                if (state.currentCourse && state.currentCourse._id === action.payload.id) {
+                    state.currentCourse = null;
                 }
             })
             // Detailed Stats
@@ -202,6 +257,13 @@ const courseSlice = createSlice({
             // Student Progress
             .addCase(getStudentProgress.fulfilled, (state, action) => {
                 state.studentProgress = action.payload;
+            })
+            .addCase(getOfficialStats.fulfilled, (state, action) => {
+                state.officialStats = action.payload;
+            })
+            // Teacher Classes Stats
+            .addCase(getTeacherClassesStats.fulfilled, (state, action) => {
+                state.teacherClassesStats = action.payload;
             });
     },
 });

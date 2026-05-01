@@ -29,49 +29,85 @@ import { useEffect } from 'react';
 // Verified 100% Stable 3D Models Library
 const PUBLIC_MODELS = [
     {
-        id: 'astro-verified',
-        title: 'NASA Astronavt',
-        category: 'astronomiya',
+        id: 'tech-innovation',
+        title: 'Raqamli Innovatsiyalar (VR Tech)',
+        category: 'texnika',
         type: 'glb',
-        url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80',
-        description: 'NASA astronavtining interaktiv 3D modeli. Har bir detalni yaqindan ko\'rish mumkin.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=600&q=80',
+        description: 'Yuqori texnologiyali VR va aviatsiya innovatsiyalari modeli.'
     },
     {
-        id: 'neil-verified',
-        title: 'Neil Armstrong (Skafandr)',
-        category: 'astronomiya',
+        id: 'cloud-infrastructure',
+        title: 'Bulutli Infrastruktura (Grid)',
+        category: 'tarmoq',
         type: 'glb',
-        url: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=600&q=80',
-        description: 'Oyga ilk qadam qo\'ygan inson skafandrining realistik 3D nusxasi.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/EnvironmentTest/glTF-Binary/EnvironmentTest.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=600&q=80',
+        description: 'Raqamli tarmoq va bulutli hisoblash muhiti vizualizatsiyasi.'
     },
     {
-        id: 'helmet-verified',
-        title: 'Damaged Helmet (Texnika)',
-        category: 'arkitektura',
+        id: 'blockchain-core',
+        title: 'Blockchain va Kripto-Xavfsizlik',
+        category: 'xavfsizlik',
         type: 'glb',
-        url: 'https://modelviewer.dev/shared-assets/models/glTF-Sample-Assets/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1542393545-10f5cde2c810?auto=format&fit=crop&w=600&q=80',
-        description: '3D grafika va teksturalar bilan ishlash namunasi bo\'lgan antik shlem.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80',
+        description: 'Kriptografik xavfsizlik va blockchain bloklari himoyasi.'
     },
     {
-        id: 'robot-verified',
-        title: 'Expressive Robot',
+        id: 'autonomous-mob',
+        title: 'Avtonom Mikromobilitet',
+        category: 'texnika',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Buggy/glTF-Binary/Buggy.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1558603668-6570496b66f8?auto=format&fit=crop&w=600&q=80',
+        description: 'Sun\'iy intellekt boshqaruvidagi aqlli shahar transporti.'
+    },
+    {
+        id: 'ridehailing-tech',
+        title: 'Ridehailing va Aqlli Logistika',
+        category: 'texnika',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CesiumMilkTruck/glTF-Binary/CesiumMilkTruck.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1519003300449-424ad040507b?auto=format&fit=crop&w=600&q=80',
+        description: 'Raqamli platformalar orqali boshqariladigan transport tizimi.'
+    },
+    {
+        id: 'ai-robotics',
+        title: 'Sun\'iy Intellekt va Robototexnika',
         category: 'ai',
         type: 'glb',
-        url: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&w=600&q=80',
-        description: 'Hissiyotlarni ifodalovchi animatsiyali robot modeli.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/RobotExpressive/glTF-Binary/RobotExpressive.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?auto=format&fit=crop&w=600&q=80',
+        description: 'Hissiyotlarni tushunuvchi va muloqot qiluvchi AI robot.'
     },
     {
-        id: 'vr-iss-stable',
-        title: 'ISS 360° VR Tajriba',
+        id: 'iot-smart-system',
+        title: 'IoT va Aqlli Uy Tizimlari',
+        category: 'ai',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
+        description: 'Internet buyumlari orqali masofaviy boshqariladigan aqlli qurilmalar.'
+    },
+    {
+        id: 'cyber-organic',
+        title: 'Kiber-Organik Jamiyat',
+        category: 'ai',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/BrainStem/glTF-Binary/BrainStem.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=600&q=80',
+        description: 'Inson miyasi va raqamli texnologiyalar integratsiyasi.'
+    },
+    {
+        id: 'iss-360-tech',
+        title: 'ISS Fazo Stansiyasi (VR Tajriba)',
         category: 'vr',
         type: 'vr',
         url: 'https://www.youtube.com/embed/2Ozlokw5f2M',
         thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
-        description: 'Xalqaro fazo stansiyasi ichida 360 darajali interaktiv video-sayohat.'
+        description: 'Xalqaro fazo stansiyasining 360 darajali texnologik sayohati.'
     }
 ];
 

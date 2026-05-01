@@ -50,10 +50,41 @@ export const deleteLesson = createAsyncThunk(
     }
 );
 
+export const updateLesson = createAsyncThunk(
+    "lessons/update",
+    async ({ id, lessonData }, { getState, rejectWithValue }) => {
+        try {
+            const { auth } = getState();
+            const response = await axios.put(API_URL + id, lessonData, {
+                headers: { "x-auth-token": auth.user.token }
+            });
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.msg || err.message);
+        }
+    }
+);
+
+export const fetchLessonById = createAsyncThunk(
+    "lessons/fetchById",
+    async (id, { getState, rejectWithValue }) => {
+        try {
+            const { auth } = getState();
+            const response = await axios.get(API_URL + id, {
+                headers: { "x-auth-token": auth.user.token }
+            });
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.msg || err.message);
+        }
+    }
+);
+
 const lessonSlice = createSlice({
     name: "lessons",
     initialState: {
         lessons: [],
+        currentLesson: null,
         loading: false,
         error: null,
     },
@@ -87,6 +118,24 @@ const lessonSlice = createSlice({
             // delete
             .addCase(deleteLesson.fulfilled, (state, action) => {
                 state.lessons = state.lessons.filter((l) => l._id !== action.payload);
+            })
+            // update
+            .addCase(updateLesson.fulfilled, (state, action) => {
+                const index = state.lessons.findIndex(l => l._id === action.payload._id);
+                if (index !== -1) state.lessons[index] = action.payload;
+                state.currentLesson = action.payload;
+            })
+            // fetch by id
+            .addCase(fetchLessonById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchLessonById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentLesson = action.payload;
+            })
+            .addCase(fetchLessonById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });

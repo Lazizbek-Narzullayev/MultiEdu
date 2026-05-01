@@ -119,6 +119,7 @@ function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/lessons" element={<LessonList />} />
           <Route path="/lessons/add" element={<LessonForm />} />
+          <Route path="/lessons/edit/:id" element={<LessonForm />} />
           <Route path="/lessons/:id" element={<LessonViewer />} />
           <Route path="/lessons/:id/quiz" element={<LessonQuiz />} />
           <Route path="/quiz/:id" element={<QuizViewer />} />

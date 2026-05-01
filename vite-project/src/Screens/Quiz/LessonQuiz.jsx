@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useBlocker } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,12 +24,17 @@ const LessonQuiz = () => {
     const [submitting, setSubmitting] = useState(false);
     const [quizResult, setQuizResult] = useState(null);
 
-    // Intercept navigation
-    const blocker = useBlocker(
-        ({ currentLocation, nextLocation }) =>
-            !quizResult && 
-            currentLocation.pathname !== nextLocation.pathname
-    );
+    // Standard browser warning for leaving page
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (!quizResult) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [quizResult]);
 
     useEffect(() => {
         fetchLesson();
@@ -41,11 +46,13 @@ const LessonQuiz = () => {
             const headers = user?.token ? { 'x-auth-token': user.token } : {};
             const res = await axios.get(`${API_BASE_URL}/lessons/${id}`, { headers });
             setLesson(res.data);
-            
-            // If already passed, maybe show results right away or let them retake.
-            // For now, we just load it.
         } catch (err) {
             console.error('Error fetching lesson:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Xatolik',
+                text: 'Test ma\'lumotlarini yuklashda xatolik yuz berdi.'
+            });
         } finally {
             setLoading(false);
         }
@@ -125,8 +132,6 @@ const LessonQuiz = () => {
     };
 
     const handleEarlySubmit = async () => {
-        blocker.reset?.(); // Close the blocker modal
-
         setSubmitting(true);
         const totalQuestions = lesson.quiz.length;
         let correct = 0;
@@ -179,35 +184,6 @@ const LessonQuiz = () => {
     return (
         <NavbarWithDrawer>
             <div className="min-h-screen bg-white dark:bg-background pb-20">
-                {/* Blocker Modal */}
-                {blocker.state === "blocked" && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-                        <div className="bg-card border border-border p-6 rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 text-amber-500 mx-auto">
-                                <AlertCircle className="w-8 h-8" />
-                            </div>
-                            <h3 className="font-black text-2xl mb-3 text-center">Testni to'xtatishni xohlaysizmi?</h3>
-                            <p className="text-muted-foreground text-center mb-8 leading-relaxed">
-                                Agar hozir chiqsangiz, faqat hozirgacha ishlagan savollaringiz tekshiriladi va testdan yiqilgan deb hisoblanasiz.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <Button 
-                                    variant="outline" 
-                                    className="rounded-2xl flex-1 h-12"
-                                    onClick={() => blocker.reset?.()}
-                                >
-                                    Yo'q, davom ettiraman
-                                </Button>
-                                <Button 
-                                    className="rounded-2xl flex-1 h-12 bg-red-500 hover:bg-red-600 text-white border-none"
-                                    onClick={handleEarlySubmit}
-                                >
-                                    Ha, to'xtataman
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 <main className="max-w-4xl mx-auto px-4 py-8">
                     

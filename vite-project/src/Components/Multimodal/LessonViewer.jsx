@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Play, Pause, Volume2, VolumeX, Maximize, ChevronRight, ChevronLeft,
   BookOpen, Brain, FileText, Send, CheckCircle2, Clock, MessageCircle, Languages,
-  RotateCcw, Sparkles, Lock, X, Cuboid
+  RotateCcw, Sparkles, Lock, X, Cuboid, Edit
 } from 'lucide-react';
 
 import { Button } from '@/Components/ui/button';
@@ -49,6 +49,7 @@ const LessonViewer = () => {
     const [nextLesson, setNextLesson] = useState(null);
 
     const playerRef = useRef(null);
+    const lastTimeRef = useRef(0);
 
     // Audio & TTS
     const [ttsSpeed, setTtsSpeed] = useState(1);
@@ -102,7 +103,9 @@ const LessonViewer = () => {
         try {
             setLoading(true);
             const headers = user?.token ? { 'x-auth-token': user.token } : {};
+            console.log('Fetching lesson with ID:', id);
             const res = await axios.get(`${API_BASE_URL}/lessons/${id}`, { headers });
+            console.log('Lesson data received:', res.data);
             setLesson(res.data);
             
             if (res.data.viewedBy && res.data.viewedBy.includes(user?._id)) {
@@ -111,17 +114,31 @@ const LessonViewer = () => {
             
             if (res.data.course) {
                 const courseId = typeof res.data.course === 'object' ? res.data.course._id : res.data.course;
-                const courseRes = await axios.get(`${API_BASE_URL}/courses/${courseId}`);
-                const lessons = courseRes.data.lessons || [];
-                const currentIndex = lessons.findIndex(l => (l._id || l) === id);
-                if (currentIndex >= 0 && currentIndex < lessons.length - 1) {
-                    setNextLesson(lessons[currentIndex + 1]);
-                } else {
-                    setNextLesson(null);
+                console.log('Detected course ID:', courseId);
+                
+                if (courseId && courseId !== 'null' && courseId !== 'undefined' && courseId !== id) {
+                    try {
+                        const courseRes = await axios.get(`${API_BASE_URL}/courses/${courseId}`, { headers });
+                        console.log('Course data received:', courseRes.data);
+                        const lessons = courseRes.data.lessons || [];
+                        const currentIndex = lessons.findIndex(l => (l._id || l) === id);
+                        if (currentIndex >= 0 && currentIndex < lessons.length - 1) {
+                            setNextLesson(lessons[currentIndex + 1]);
+                        } else {
+                            setNextLesson(null);
+                        }
+                    } catch (courseErr) {
+                        console.error('Error fetching course info:', courseErr);
+                    }
                 }
             }
         } catch (err) {
             console.error('Error fetching lesson:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Xatolik',
+                text: 'Darsni yuklashda xatolik yuz berdi. Iltimos, qaytadan urunib ko\'ring.'
+            });
         } finally {
             setLoading(false);
         }
@@ -157,12 +174,37 @@ const LessonViewer = () => {
     const onPlayerReady = (event) => {
         setDuration(event.target.getDuration());
         playerRef.current = event.target;
-        setInterval(() => {
-            if(event.target.getPlayerState() === 1) {
-                setCurrentTime(event.target.getCurrentTime());
-            }
-        }, 1000);
     };
+
+    useEffect(() => {
+        let interval;
+        if (isPlaying && playerRef.current) {
+            interval = setInterval(() => {
+                const newTime = playerRef.current.getCurrentTime();
+                
+                // Prevent seeking forward
+                if (!videoCompleted && !isTeacher) {
+                    if (newTime > lastTimeRef.current + 2) {
+                        playerRef.current.seekTo(lastTimeRef.current);
+                        Swal.fire({
+                            title: "O'tkazib bo'lmaydi",
+                            text: "Darsni to'liq ko'rishingiz kerak",
+                            icon: "warning",
+                            timer: 1500,
+                            showConfirmButton: false,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                    } else if (newTime > lastTimeRef.current) {
+                        lastTimeRef.current = newTime;
+                    }
+                }
+                
+                setCurrentTime(newTime);
+            }, 500);
+        }
+        return () => clearInterval(interval);
+    }, [isPlaying, videoCompleted, isTeacher, id]);
 
     const onPlayerStateChange = (event) => {
         if (event.data === 1) setIsPlaying(true);
@@ -243,13 +285,54 @@ const LessonViewer = () => {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
+    // Parse transcript with [MM:SS] markers for precise sync
+    const getActiveSubtitle = () => {
+        if (!lesson?.transcript) return "";
+        
+        // Regex to find [MM:SS] markers and the text following them
+        const regex = /\[(\d{1,2}):(\d{2})\]\s*([^\[\n]+)/g;
+        const timedSegments = [];
+        let match;
+        
+        while ((match = regex.exec(lesson.transcript)) !== null) {
+            const minutes = parseInt(match[1]);
+            const seconds = parseInt(match[2]);
+            const time = minutes * 60 + seconds;
+            const text = match[3].trim();
+            timedSegments.push({ time, text });
+        }
+
+        if (timedSegments.length > 0) {
+            // Find the active segment based on currentTime
+            let activeText = "";
+            for (let i = 0; i < timedSegments.length; i++) {
+                if (currentTime >= timedSegments[i].time) {
+                    activeText = timedSegments[i].text;
+                } else {
+                    break;
+                }
+            }
+            return activeText;
+        }
+        
+        // Fallback to sentence-based heuristic if no time markers are found
+        if (!duration) return "";
+        const sentences = lesson.transcript.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+        if (sentences.length === 0) return "";
+        
+        const segmentDuration = duration / sentences.length;
+        const currentSegmentIndex = Math.floor(currentTime / segmentDuration);
+        
+        return sentences[currentSegmentIndex] || "";
+    };
+
     const hasQuiz = lesson.quiz && lesson.quiz.length > 0;
     const hasPassedQuiz = lesson.viewedBy?.includes(user?._id) || isTeacher;
 
     return (
         <NavbarWithDrawer>
             <div className="min-h-screen bg-[#f8fafc] dark:bg-background pb-20">
-                <main className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
+                <main className="max-w-6xl mx-auto px-4 lg:px-6 py-4">
                     <div className="grid lg:grid-cols-12 gap-8">
                         {/* Left Column: Video & Metadata */}
                         <div className="lg:col-span-8 space-y-6">
@@ -264,7 +347,10 @@ const LessonViewer = () => {
                                             playerVars: { 
                                                 rel: 0, 
                                                 modestbranding: 1,
-                                                controls: 1,
+                                                controls: 0, // Hiding YouTube controls to prevent clicking "Watch on YouTube"
+                                                disablekb: 1,
+                                                fs: 0,
+                                                iv_load_policy: 3
                                             },
                                         }}
                                         onReady={onPlayerReady}
@@ -278,6 +364,53 @@ const LessonViewer = () => {
                                     </div>
                                 )}
 
+                                {/* Transparent Overlay to block clicks on YouTube logo/links */}
+                                <div className="absolute inset-0 z-[5] bg-transparent" onClick={() => {
+                                    if (isPlaying) playerRef.current?.pauseVideo();
+                                    else playerRef.current?.playVideo();
+                                }} />
+
+                                {/* Custom Progress Bar Overlay */}
+                                <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={() => isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo()} className="text-white">
+                                            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                                        </button>
+                                        <div className="flex-1 h-1.5 bg-white/20 rounded-full relative overflow-hidden">
+                                            <div 
+                                                className="absolute left-0 top-0 bottom-0 bg-primary transition-all duration-300" 
+                                                style={{ width: `${(currentTime / duration) * 100}%` }}
+                                            />
+                                        </div>
+                                        <span className="text-[10px] font-bold text-white tabular-nums">
+                                            {formatTime(currentTime)} / {formatTime(duration)}
+                                        </span>
+                                        <button 
+                                            onClick={() => setShowAiSubtitles(!showAiSubtitles)} 
+                                            className={`transition-colors ${showAiSubtitles ? 'text-primary' : 'text-white/60 hover:text-white'}`}
+                                            title="AI Subtitrlar"
+                                        >
+                                            <Languages className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* AI Subtitles Overlay */}
+                                <AnimatePresence>
+                                    {showAiSubtitles && isPlaying && getActiveSubtitle() && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[8] w-[80%] text-center"
+                                        >
+                                            <span className="bg-black/60 backdrop-blur-md text-white px-6 py-2 rounded-xl text-sm md:text-base font-medium border border-white/10 shadow-xl inline-block">
+                                                {getActiveSubtitle()}
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
                                 {/* Lock Indicator */}
                                 {!videoCompleted && (
                                     <div className="absolute top-4 left-4 z-10 pointer-events-none">
@@ -290,20 +423,32 @@ const LessonViewer = () => {
                             </div>
 
                             {/* Lesson Metadata */}
-                            <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm">
-                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
-                                    <div>
-                                        <h1 className="text-2xl md:text-3xl font-black text-foreground leading-tight mb-2">
-                                            {lesson.title}
-                                        </h1>
-                                        <p className="text-sm font-medium text-muted-foreground">
-                                            {lesson.course?.title || "Kurs"} • {lesson.module || "Modul"}, dars
-                                        </p>
+                            <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm">
+                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h1 className="text-2xl md:text-3xl font-black text-foreground leading-tight">
+                                                    {lesson.title}
+                                                </h1>
+                                                {isTeacher && (
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="w-8 h-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                                        onClick={() => navigate(`/lessons/edit/${id}`)}
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                            <p className="text-sm font-medium text-muted-foreground">
+                                                {lesson.course?.title || "Kurs"} • {lesson.module || "Modul"}, dars
+                                            </p>
+                                        </div>
+                                        <Badge variant="secondary" className="w-fit text-sm px-4 py-1.5 font-bold bg-primary/10 text-primary">
+                                            Ko'rilmoqda
+                                        </Badge>
                                     </div>
-                                    <Badge variant="secondary" className="w-fit text-sm px-4 py-1.5 font-bold bg-primary/10 text-primary">
-                                        Ko'rilmoqda
-                                    </Badge>
-                                </div>
 
                                 <div className="py-6 border-t border-b border-border mb-6">
                                     <div className="flex items-center justify-between mb-4">
@@ -323,7 +468,7 @@ const LessonViewer = () => {
                                             )}
                                         </Button>
                                     </div>
-                                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 max-h-[350px] overflow-y-auto custom-scrollbar pr-4">
+                                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 max-h-[300px] overflow-y-auto custom-scrollbar pr-4">
                                         <p className="whitespace-pre-wrap leading-relaxed">
                                             {lesson.textContent || lesson.description || "Ushbu dars uchun matn kiritilmagan."}
                                         </p>
