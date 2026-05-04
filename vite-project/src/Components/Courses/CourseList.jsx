@@ -9,18 +9,19 @@ import {
   Play, 
   Boxes,
   Hash,
-  GraduationCap,
   ArrowRight,
   Search,
   Filter,
   Users,
-  Layout
+  Layout,
+  BookOpen,
+  Sparkles,
+  Rocket
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import NavbarWithDrawer from '../NavDrawer';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 
 const CourseList = () => {
     const dispatch = useDispatch();
@@ -28,7 +29,6 @@ const CourseList = () => {
     const { courses, officialCourses, loading, error } = useSelector((state) => state.courses);
     const { user } = useSelector((state) => state.auth);
 
-    const [activeTab, setActiveTab] = useState(user?.role === 'super-admin' ? "official" : "classroom");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isJoinOpen, setIsJoinOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -62,7 +62,7 @@ const CourseList = () => {
         if (!newCourse.title || !newCourse.description) return;
         const payload = { 
             ...newCourse, 
-            isOfficial: user?.role === 'super-admin' && activeTab === "official" 
+            isOfficial: false 
         };
         const action = await dispatch(createCourse(payload));
         if (createCourse.fulfilled.match(action)) {
@@ -87,78 +87,79 @@ const CourseList = () => {
         }
     };
 
-    const currentCourses = activeTab === "official" ? officialCourses : courses;
+    const currentCourses = courses;
     const filteredCourses = (currentCourses || []).filter(c => 
-        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.description.toLowerCase().includes(searchQuery.toLowerCase())
+        (c.title && c.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (c.description && c.description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     const CourseCard = ({ course, isOfficial, index }) => {
-        const defaultImage = "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1000&auto=format&fit=crop";
+        const defaultImage = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop";
         
         return (
             <motion.div
                 layout
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="group bg-white border border-[#f1f5f9] rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex flex-col h-full"
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className="group relative h-full"
             >
-                <div className="aspect-[16/9] bg-[#f8fafc] relative overflow-hidden">
-                    <img
-                        src={course.thumbnail || defaultImage}
-                        alt={course.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e) => { e.target.src = defaultImage; }}
-                    />
-                    
-                    <div className="absolute top-4 left-4 flex gap-2">
-                        {isOfficial ? (
-                            <Badge className="bg-primary/90 backdrop-blur-md text-white border-0 shadow-lg px-3 py-1 font-black text-[10px] uppercase tracking-wider">Official</Badge>
-                        ) : (
-                            <Badge className="bg-emerald-500/90 backdrop-blur-md text-white border-0 shadow-lg px-3 py-1 font-black text-[10px] uppercase tracking-wider">Classroom</Badge>
-                        )}
-                        {!isOfficial && user?.role === 'teacher' && (
-                            <Badge className="bg-white/90 backdrop-blur-md text-[#0f172a] border-0 shadow-lg font-black tracking-[0.2em] text-[10px]">
-                                {course.joinCode}
-                            </Badge>
-                        )}
-                    </div>
-
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-xl transform scale-75 group-hover:scale-100 transition-transform">
-                            <Play className="w-5 h-5 text-primary fill-primary" />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 rounded-[2.5rem] blur-2xl transition-opacity duration-500" />
+                
+                <div className="relative bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex flex-col h-full z-10">
+                    <div className="aspect-[16/10] bg-slate-50 relative overflow-hidden">
+                        <img
+                            src={course.thumbnail || defaultImage}
+                            alt={course.title}
+                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                            onError={(e) => { e.target.src = defaultImage; }}
+                        />
+                        
+                        <div className="absolute top-5 left-5 flex flex-col gap-2 z-20">
+                            {isOfficial ? (
+                                <Badge className="bg-primary backdrop-blur-md text-white border-0 shadow-lg px-4 py-1.5 font-black text-[9px] uppercase tracking-widest rounded-xl">Platforma</Badge>
+                            ) : (
+                                <Badge className="bg-[#10b981] backdrop-blur-md text-white border-0 shadow-lg px-4 py-1.5 font-black text-[9px] uppercase tracking-widest rounded-xl">Sinfxona</Badge>
+                            )}
                         </div>
-                    </div>
-                </div>
 
-                <div className="p-6 flex-1 flex flex-col cursor-pointer" onClick={() => navigate(`/courses/${course._id}`)}>
-                    <div className="flex-1">
-                        <h3 className="text-[1.1rem] font-black text-[#0f172a] leading-tight group-hover:text-primary transition-colors line-clamp-2 h-[2.8rem] mb-2">
-                            {course.title}
-                        </h3>
-                        <p className="text-[0.85rem] text-[#64748b] font-medium line-clamp-2 leading-relaxed h-[2.6rem] mb-4">
-                            {course.description}
-                        </p>
-                    </div>
-
-                    <div className="mt-auto pt-5 border-t border-[#f1f5f9] flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-[#f3e8ff] flex items-center justify-center text-[#7c3aed]">
-                                <Users className="w-4 h-4" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-[#0f172a]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                        
+                        <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end z-20">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">Mavzu</span>
+                                <h3 className="text-white text-xl font-black leading-tight line-clamp-1">{course.title}</h3>
                             </div>
-                            <span className="text-[0.65rem] font-black text-[#64748b] uppercase tracking-wider truncate max-w-[120px]">
-                                {course.instructor?.name || 'MultiEdu Academy'}
-                            </span>
+                            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                                <ArrowRight className="w-5 h-5" />
+                            </div>
                         </div>
-                        <Button 
-                            variant="ghost"
-                            className="h-9 px-4 rounded-xl text-primary font-black gap-2 hover:bg-primary/5 text-[0.85rem]"
-                            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course._id}`); }}
-                        >
-                            Kirish
-                            <ArrowRight className="w-4 h-4" />
-                        </Button>
+                    </div>
+
+                    <div className="p-8 flex-1 flex flex-col">
+                        <p className="text-slate-500 font-medium text-sm line-clamp-2 leading-relaxed mb-6">
+                            {course.description || "Ushbu sinfxona orqali siz o'qituvchi bilan birga darslarni o'rganishingiz mumkin."}
+                        </p>
+
+                        <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                    <Users className="w-5 h-5" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">O'qituvchi</span>
+                                    <span className="text-xs font-black text-slate-700">{course.instructor?.name || 'Admin'}</span>
+                                </div>
+                            </div>
+
+                            <Button 
+                                variant="contained"
+                                className="rounded-xl px-6 h-10 font-black text-[10px] uppercase tracking-widest bg-[#0f172a] text-white hover:bg-primary transition-colors border-none"
+                                onClick={() => navigate(`/courses/${course._id}`)}
+                            >
+                                KIRISH
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </motion.div>
@@ -167,29 +168,33 @@ const CourseList = () => {
 
     return (
         <NavbarWithDrawer>
-            <div className="min-h-screen bg-[#f8fafc] pb-20">
-                {/* Premium Dark Header */}
-                <div className="relative overflow-hidden bg-[#0f172a] pt-12 pb-24 px-6">
+            <div className="min-h-screen bg-[#f8fafc] pb-24 font-sans selection:bg-primary/20">
+                {/* Modern Header Section */}
+                <div className="relative overflow-hidden bg-[#0f172a] pt-16 pb-28 px-6">
                     <div className="absolute top-0 right-0 w-[40%] h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
-                    <div className="absolute -top-24 -left-24 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                    <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
                     
-                    <div className="max-w-7xl mx-auto relative z-10">
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div className="max-w-[1200px] mx-auto relative z-10">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.6 }}
                                 className="space-y-4"
                             >
-                                <div className="flex items-center gap-2 text-primary">
-                                    <Layout className="w-5 h-5" />
-                                    <span className="text-xs font-black uppercase tracking-[0.2em]">O'quv tizimi</span>
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-primary" />
+                                    <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Bilimlar platformasi</span>
                                 </div>
-                                <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tight">
-                                    {activeTab === "official" ? "Rasmiy kurslar" : "Sinflar"}
+                                <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+                                    Sinfxonalar <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-400">
+                                        roʻyxati
+                                    </span>
                                 </h1>
-                                <p className="text-slate-400 text-lg font-medium max-w-xl leading-relaxed">
-                                    Eng ilg'or bilimlar va zamonaviy darsliklarni bizning multimodal platformada kashf qiling.
+                                <p className="text-slate-400 text-lg font-medium max-w-lg leading-relaxed">
+                                    Innovatsion va zamonaviy multimodal taʼlim platformasi. 
+                                    Oʻzingizga maʼqul boʻlgan yoʻnalishni tanlang.
                                 </p>
                             </motion.div>
 
@@ -197,23 +202,23 @@ const CourseList = () => {
                                 initial={{ opacity: 0, scale: 0.9 }} 
                                 animate={{ opacity: 1, scale: 1 }} 
                                 transition={{ delay: 0.2 }}
-                                className="flex flex-wrap gap-4"
+                                className="flex gap-4"
                             >
                                 {user?.role === 'super-admin' && (
                                     <Button 
-                                        className="h-14 px-8 rounded-[1.25rem] bg-primary hover:bg-primary/90 text-white font-black shadow-2xl shadow-primary/20 gap-2 border-none"
+                                        className="h-16 px-10 rounded-2xl bg-primary hover:bg-white hover:text-primary text-white font-black shadow-xl shadow-primary/20 gap-2 border-none transition-all duration-300 group"
                                         onClick={() => setIsCreateOpen(true)}
                                     >
-                                        <Plus className="w-5 h-5" />
-                                        Yangi kurs yaratish
+                                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                                        Yaratish
                                     </Button>
                                 )}
                                 {user?.role === 'student' && (
                                     <Button 
-                                        className="h-14 px-8 rounded-[1.25rem] bg-[#10b981] hover:bg-[#059669] text-white font-black shadow-2xl shadow-emerald-500/20 gap-2 border-none"
+                                        className="h-16 px-10 rounded-2xl bg-[#10b981] hover:bg-white hover:text-[#10b981] text-white font-black shadow-xl shadow-emerald-500/20 gap-2 border-none transition-all duration-300 group"
                                         onClick={() => setIsJoinOpen(true)}
                                     >
-                                        <Hash className="w-5 h-5" />
+                                        <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
                                         Sinfga qo'shilish
                                     </Button>
                                 )}
@@ -222,41 +227,36 @@ const CourseList = () => {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6">
-                    {/* Search & Tabs Bar */}
+                <div className="max-w-[1200px] mx-auto px-6">
+                    {/* Search Bar - Floating Effect */}
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }} 
-                        transition={{ delay: 0.3 }}
-                        className="bg-white p-2 mb-12 -mt-8 rounded-[1.5rem] shadow-xl shadow-slate-200/50 flex flex-col md:flex-row items-center gap-4 border border-[#f1f5f9] relative z-20"
+                        transition={{ delay: 0.4 }}
+                        className="bg-white p-2 mb-16 -mt-10 rounded-3xl shadow-xl shadow-slate-200/50 flex items-center gap-4 border border-slate-100 relative z-20"
                     >
-                        <div className="flex-1 w-full flex items-center px-4 gap-3">
-                            <Search className="w-5 h-5 text-slate-400" />
+                        <div className="flex-1 flex items-center px-6 gap-3">
+                            <Search className="w-5 h-5 text-slate-300" />
                             <input 
                                 type="text"
-                                placeholder="Kurslarni qidirish..."
+                                placeholder="Sinflarni qidiring..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-12 bg-transparent outline-none font-bold text-slate-700 placeholder:text-slate-400"
+                                className="w-full h-12 bg-transparent outline-none font-bold text-lg text-slate-700 placeholder:text-slate-300"
                             />
                         </div>
                         
-                        <div className="h-10 w-px bg-slate-100 hidden md:block" />
-                        
-                        <div className="flex items-center gap-4 px-2 w-full md:w-auto">
-                            <Tabs value={activeTab} onValueChange={setActiveTab} className="bg-slate-50 p-1 rounded-xl">
-                                <TabsList className="bg-transparent h-10 gap-1">
-                                    <TabsTrigger value="official" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Rasmiy</TabsTrigger>
-                                    <TabsTrigger value="classroom" className="rounded-lg px-6 font-black data-[state=active]:bg-white data-[state=active]:shadow-sm">Sinfxonalar</TabsTrigger>
-                                </TabsList>
-                            </Tabs>
+                        <div className="px-6">
+                            <Badge className="bg-primary/10 text-primary border-none px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">
+                                {filteredCourses.length} TA SINFXONA
+                            </Badge>
                         </div>
                     </motion.div>
 
                     {loading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="h-[400px] bg-white border border-[#f1f5f9] rounded-[2rem] animate-pulse" />
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="h-96 bg-white border border-slate-100 rounded-[2.5rem] animate-pulse" />
                             ))}
                         </div>
                     ) : filteredCourses.length > 0 ? (
@@ -276,15 +276,16 @@ const CourseList = () => {
                         <motion.div 
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }}
-                            className="text-center py-24 bg-white/50 backdrop-blur-sm border-2 border-dashed border-[#e2e8f0] rounded-[3rem] space-y-6"
+                            className="text-center py-24 bg-white/50 backdrop-blur-sm border-2 border-dashed border-slate-200 rounded-[3rem] space-y-6"
                         >
-                            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto">
-                                <Boxes className="w-10 h-10 text-slate-300" />
+                            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto text-slate-300">
+                                <Boxes className="w-10 h-10" />
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-xl font-black text-[#1e293b]">Hech narsa topilmadi</h3>
-                                <p className="text-[#64748b] font-medium">Qidiruv natijalari bo'yicha kurslar mavjud emas.</p>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-[#0f172a]">Kurslar topilmadi</h3>
+                                <p className="text-slate-500 font-medium">Bu bo'limda hozircha darslar mavjud emas.</p>
                             </div>
+                            <Button variant="outline" className="rounded-xl px-8 h-12 font-black border-2" onClick={() => setSearchQuery('')}>Qidiruvni tozalash</Button>
                         </motion.div>
                     )}
                 </div>
@@ -294,26 +295,26 @@ const CourseList = () => {
             <AnimatePresence>
                 {isCreateOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsCreateOpen(false)} />
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-[#0f172a]/60 backdrop-blur-md" onClick={() => setIsCreateOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
-                            <div className="p-8 space-y-8">
+                            <div className="p-8 space-y-6">
                                 <div className="space-y-1">
                                     <h2 className="text-2xl font-black text-[#1e293b]">Yangi kurs yaratish</h2>
-                                    <p className="text-[#64748b] font-medium text-sm">Platformada yangi rasmiy darslik yoki sinfxona kiriting.</p>
+                                    <p className="text-slate-500 font-medium text-sm">Platformada yangi darslik kiriting.</p>
                                 </div>
-                                <div className="space-y-5">
+                                <div className="space-y-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Kurs nomi</label>
-                                        <input className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white px-4 outline-none transition-all font-bold text-slate-700" placeholder="Masalan: Web dasturlash" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} />
+                                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Kurs nomi</label>
+                                        <input className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white px-5 outline-none transition-all font-bold text-slate-700" placeholder="Masalan: Web dasturlash" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Qisqacha tavsif</label>
-                                        <textarea className="w-full bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl p-4 min-h-[120px] focus:outline-none transition-all text-sm font-bold text-slate-700" placeholder="Kurs haqida qisqacha ma'lumot..." value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
+                                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tavsif</label>
+                                        <textarea className="w-full bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl p-5 min-h-[120px] focus:outline-none transition-all text-sm font-bold text-slate-700" placeholder="Kurs haqida batafsil..." value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
                                     </div>
                                 </div>
-                                <div className="flex gap-3">
-                                    <Button variant="ghost" className="flex-1 h-12 rounded-xl font-black text-[#64748b]" onClick={() => setIsCreateOpen(false)}>Bekor qilish</Button>
-                                    <Button className="flex-1 h-12 rounded-xl font-black bg-primary text-white shadow-xl shadow-primary/20 border-none" onClick={handleCreate}>Yaratish</Button>
+                                <div className="flex gap-3 pt-4">
+                                    <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-black text-slate-400" onClick={() => setIsCreateOpen(false)}>Bekor qilish</Button>
+                                    <Button className="flex-1 h-14 rounded-2xl font-black bg-primary text-white shadow-lg shadow-primary/20 border-none" onClick={handleCreate}>Yaratish</Button>
                                 </div>
                             </div>
                         </motion.div>
@@ -325,20 +326,20 @@ const CourseList = () => {
             <AnimatePresence>
                 {isJoinOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsJoinOpen(false)} />
-                        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl relative z-10 overflow-hidden">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-[#0f172a]/60 backdrop-blur-md" onClick={() => setIsJoinOpen(false)} />
+                        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
                             <div className="p-10 text-center space-y-8">
-                                <div className="w-16 h-16 bg-[#ecfdf5] rounded-2xl flex items-center justify-center mx-auto text-[#10b981]">
-                                    <Hash className="w-8 h-8" />
+                                <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto text-[#10b981]">
+                                    <Hash className="w-10 h-10" />
                                 </div>
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-black text-[#1e293b]">Sinfga qo'shilish</h2>
-                                    <p className="text-[0.8rem] text-[#64748b] font-medium leading-relaxed">O'qituvchi bergan 6 xonali kodni kiriting.</p>
-                                </div>
-                                <input className="w-full h-16 rounded-2xl text-center text-3xl font-black tracking-[0.3em] bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white outline-none transition-all placeholder:text-xs placeholder:tracking-normal uppercase" placeholder="KODNI YOZING" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} maxLength={6} />
                                 <div className="space-y-2">
-                                    <Button className="w-full h-12 rounded-xl font-black bg-[#10b981] hover:bg-[#059669] text-white shadow-xl shadow-emerald-500/20 border-none" onClick={handleJoin}>Qo'shilish</Button>
-                                    <Button variant="ghost" className="w-full h-12 rounded-xl font-black text-[#64748b]" onClick={() => setIsJoinOpen(false)}>Bekor qilish</Button>
+                                    <h2 className="text-2xl font-black text-[#1e293b]">Sinfga qo'shilish</h2>
+                                    <p className="text-slate-500 font-medium text-sm leading-relaxed">O'qituvchi bergan 6 xonali kodni kiriting.</p>
+                                </div>
+                                <input className="w-full h-16 rounded-2xl text-center text-4xl font-black tracking-[0.3em] bg-slate-50 border-2 border-transparent focus:border-[#10b981] focus:bg-white outline-none transition-all uppercase text-[#1e293b]" placeholder="000000" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} maxLength={6} />
+                                <div className="space-y-3">
+                                    <Button className="w-full h-14 rounded-2xl font-black bg-[#10b981] hover:bg-[#059669] text-white shadow-lg shadow-emerald-500/20 border-none" onClick={handleJoin}>Qo'shilish</Button>
+                                    <Button variant="ghost" className="w-full h-12 rounded-2xl font-black text-slate-400" onClick={() => setIsJoinOpen(false)}>Bekor qilish</Button>
                                 </div>
                             </div>
                         </motion.div>

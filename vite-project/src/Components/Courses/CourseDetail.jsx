@@ -150,59 +150,55 @@ const CourseDetail = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#1e293b]/60 to-transparent" />
                     
-                    <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 max-w-[1440px] mx-auto w-full">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-                            <div className="space-y-4 max-w-2xl">
-                                <Badge className="bg-primary text-white border-none px-4 py-1.5 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20">
+                    <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-20 max-w-[1440px] mx-auto w-full">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+                            <div className="space-y-6 max-w-4xl">
+                                <Badge className="bg-primary text-white border-none px-6 py-2 font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl shadow-primary/40 rounded-full">
                                     {currentCourse.isOfficial ? "Rasmiy Kurs" : "Sinf xonasi"}
                                 </Badge>
-                                <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+                                <h1 className="text-5xl md:text-9xl font-black text-white tracking-tight leading-[0.95] drop-shadow-2xl">
                                     {currentCourse.title}
                                 </h1>
-                                <div className="flex flex-wrap items-center gap-6 text-white/90 font-bold">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar sx={{ width: 40, height: 40, bgcolor: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.3)' }}>
+                                <div className="flex flex-wrap items-center gap-8 text-white/95 font-black pt-4">
+                                    <div className="flex items-center gap-4 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-[1.5rem] border border-white/20">
+                                        <Avatar sx={{ width: 44, height: 44, bgcolor: '#7c3aed', border: '3px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
                                             {currentCourse.teacher?.name?.[0] || 'L'}
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] uppercase text-white/60 tracking-wider">O'qituvchi</span>
-                                            <span className="text-sm">{currentCourse.teacher?.name || "MultiEdu Academy"}</span>
+                                            <span className="text-[10px] uppercase text-white/60 tracking-widest">O'qituvchi</span>
+                                            <span className="text-base">{currentCourse.teacher?.name || "MultiEdu Academy"}</span>
                                         </div>
                                     </div>
-                                    <div className="h-8 w-[1px] bg-white/20 hidden sm:block" />
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-primary" />
-                                        <span>{currentCourse.students?.length || 0} o'quvchi</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                                            <Users className="w-6 h-6 text-primary" />
+                                        </div>
+                                        <span className="text-lg">{currentCourse.students?.length || 0} o'quvchi</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <BookOpen className="w-5 h-5 text-primary" />
-                                        <span>{currentCourse.lessons?.length || 0} dars</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                                            <BookOpen className="w-6 h-6 text-primary" />
+                                        </div>
+                                        <span className="text-lg">{currentCourse.lessons?.length || 0} dars</span>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 pb-4">
                                 {isOwner && (
                                     <>
                                         <Button 
                                             variant="outline" 
-                                            className="h-12 bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-2xl backdrop-blur-md px-6 font-black"
+                                            className="h-16 bg-white/10 border-white/20 text-white hover:bg-white hover:text-primary rounded-[1.5rem] backdrop-blur-md px-8 font-black transition-all duration-500 text-lg"
                                             onClick={() => setIsEditOpen(true)}
                                         >
-                                            <Settings className="w-4 h-4 mr-2" />
+                                            <Settings className="w-6 h-6 mr-3" />
                                             Sozlamalar
-                                        </Button>
-                                        <Button 
-                                            variant="outline" 
-                                            className="h-12 bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20 rounded-2xl backdrop-blur-md px-4 font-black"
-                                            onClick={handleDeleteCourse}
-                                        >
-                                            <Trash2 className="w-5 h-5" />
                                         </Button>
                                     </>
                                 )}
-                                <Button className="h-12 bg-white text-[#1e293b] hover:bg-white/90 rounded-2xl px-10 shadow-2xl shadow-black/20 font-black">
-                                    <Share2 className="w-4 h-4 mr-2" />
+                                <Button className="h-16 bg-white text-primary hover:bg-slate-100 rounded-[1.5rem] px-10 shadow-2xl shadow-black/30 font-black text-lg transition-all duration-500">
+                                    <Share2 className="w-6 h-6 mr-3" />
                                     Ulashish
                                 </Button>
                             </div>

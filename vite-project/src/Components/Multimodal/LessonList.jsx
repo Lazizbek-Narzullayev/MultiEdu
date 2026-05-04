@@ -38,10 +38,12 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config/apiConfig';
 
+import { getOfficialCourses } from '../../store/Slice/courseSlice';
+
 const LessonList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { lessons, loading, error } = useSelector((state) => state.lessons);
+    const { officialCourses, loading: coursesLoading, error } = useSelector((state) => state.courses);
     const { user } = useSelector((state) => state.auth);
     const [completedLessonIds, setCompletedLessonIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +51,7 @@ const LessonList = () => {
     const [selectedLesson, setSelectedLesson] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchLessons());
+        dispatch(getOfficialCourses());
         
         if (user && user.token) {
             axios.get(`${API_BASE_URL}/lessons/my-progress`, {
@@ -117,9 +119,14 @@ const LessonList = () => {
         return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800';
     };
 
-    const filteredLessons = lessons.filter(l => 
+    const allLessons = officialCourses?.reduce((acc, course) => {
+        const courseLessons = course.lessons || [];
+        return [...acc, ...courseLessons];
+    }, []) || [];
+
+    const filteredLessons = allLessons.filter(l => 
         l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.category?.toLowerCase().includes(searchQuery.toLowerCase())
+        (l.category && l.category.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     return (
@@ -155,14 +162,14 @@ const LessonList = () => {
                                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                                     <LibraryBooksIcon sx={{ color: '#00A5C4' }} />
                                     <Typography variant="overline" sx={{ fontWeight: 800, letterSpacing: 2, color: '#00A5C4' }}>
-                                        Platforma resurslari
+                                        Platforma Akademiyasi
                                     </Typography>
                                 </Stack>
                                 <Typography variant="h2" sx={{ fontWeight: 900, mb: 1, letterSpacing: -1, fontSize: { xs: '2rem', md: '2.8rem' } }}>
-                                    Darslar va <span style={{ color: '#00A5C4' }}>resurslar</span>
+                                    Darslar va resurslar
                                 </Typography>
                                 <Typography sx={{ color: '#94a3b8', fontSize: '1.1rem', maxWidth: 600, fontWeight: 500 }}>
-                                    Innovatsion texnologiyalarni multimodal usulda o'rganing. Kelajak texnologiyalari markaziga xush kelibsiz.
+                                    Innovatsion texnologiyalarni multimodal usulda oʻrganing. Kelajak texnologiyalari markaziga xush kelibsiz.
                                 </Typography>
                             </motion.div>
 
@@ -225,7 +232,7 @@ const LessonList = () => {
                         </Paper>
                     </motion.div>
 
-                    {loading ? (
+                    {coursesLoading ? (
                         <Grid container spacing={4}>
                             {[1, 2, 3, 4, 5, 6].map((n) => (
                                 <Grid item xs={12} sm={6} md={4} key={n}>
@@ -399,7 +406,7 @@ const LessonList = () => {
                         </Grid>
                     )}
 
-                    {!loading && filteredLessons.length === 0 && (
+                    {!coursesLoading && filteredLessons.length === 0 && (
                         <Box sx={{ 
                             textAlign: 'center', py: 15, borderRadius: '32px', 
                             border: '2px dashed #e2e8f0', bgcolor: 'rgba(255,255,255,0.5)', mt: 4 

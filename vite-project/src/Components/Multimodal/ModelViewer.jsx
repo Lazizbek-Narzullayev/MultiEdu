@@ -1,4 +1,5 @@
 import React, { Suspense, useState, useRef, useEffect } from 'react';
+import YouTube from 'react-youtube';
 import { Box, CircularProgress, Typography, Button, IconButton, Tooltip } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -126,17 +127,43 @@ const ModelViewer = ({ model }) => {
             </Box>
         );
     }
-
     // Video Embed
     if (isVideo) {
+        const getYouTubeId = (url) => {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        };
+        const videoId = getYouTubeId(url);
+
         return (
-            <Box sx={{ width: '100%', height: '500px', bgcolor: '#000', borderRadius: 4, overflow: 'hidden' }}>
-                <iframe 
-                    title="Video Content"
-                    src={url}
-                    style={{ width: '100%', height: '100%', border: 'none' }}
-                    allowFullScreen
-                />
+            <Box sx={{ width: '100%', height: '100%', minHeight: '400px', bgcolor: '#000', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
+                {videoId ? (
+                    <YouTube
+                        videoId={videoId}
+                        opts={{
+                            height: '100%',
+                            width: '100%',
+                            playerVars: { 
+                                rel: 0, 
+                                modestbranding: 1,
+                                controls: 1, 
+                                disablekb: 1,
+                                fs: 1,
+                                iv_load_policy: 3,
+                            },
+                        }}
+                        className="w-[108%] h-[108%] absolute -top-[4%] -left-[4%] pointer-events-none"
+                    />
+                ) : (
+                    <iframe 
+                        title="Video Content"
+                        src={url}
+                        style={{ width: '108%', height: '108%', border: 'none', position: 'absolute', top: '-4%', left: '-4%', pointerEvents: 'none' }}
+                        allowFullScreen
+                    />
+                )}
             </Box>
         );
     }

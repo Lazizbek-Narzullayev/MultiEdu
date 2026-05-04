@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { IconButton } from '@mui/material';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/apiConfig';
-import { getMyCourses, getStudentStats, getStudentProgress } from '../store/Slice/courseSlice';
+import { getMyCourses, getStudentStats, getStudentProgress, getOfficialCourses } from '../store/Slice/courseSlice';
 import NavbarWithDrawer from './NavDrawer';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
@@ -29,7 +29,9 @@ import {
   Bell,
   MessageCircle,
   X,
-  Send
+  Send,
+  Brain,
+  Users
 } from 'lucide-react';
 
 const StudentDashboard = () => {
@@ -37,7 +39,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { courses, studentStats, studentProgress } = useSelector((state) => state.courses);
+  const { courses, officialCourses, studentStats, studentProgress } = useSelector((state) => state.courses);
   const token = user?.token;
 
   const [loading, setLoading] = useState(true);
@@ -56,6 +58,7 @@ const StudentDashboard = () => {
         setLoading(true);
         await Promise.all([
           dispatch(getMyCourses()),
+          dispatch(getOfficialCourses()),
           dispatch(getStudentStats()),
           dispatch(getStudentProgress())
         ]);
@@ -90,13 +93,20 @@ const StudentDashboard = () => {
   }, [chatMessages]);
 
   const handleContinue = () => {
-    if (studentStats?.lastLesson) {
+    // 1. Prioritize last lesson from Admin/Official courses (Handled by backend now)
+    if (studentStats?.lastLesson?._id) {
       navigate(`/lessons/${studentStats.lastLesson._id}`);
-    } else if (courses.length > 0 && courses[0].lessons?.length > 0) {
-        navigate(`/lessons/${courses[0].lessons[0]._id}`);
-    } else {
-      navigate('/courses');
+      return;
     }
+
+    // 2. Fallback: Find the first lesson of the first OFFICIAL course (using new state)
+    if (officialCourses && officialCourses.length > 0 && officialCourses[0].lessons?.length > 0) {
+      navigate(`/lessons/${officialCourses[0].lessons[0]._id}`);
+      return;
+    }
+
+    // 3. Last fallback: General lessons page
+    navigate('/lessons');
   };
 
   const handleAiChat = async (e) => {
@@ -138,199 +148,262 @@ const StudentDashboard = () => {
     : 0;
 
   return (
-    <NavbarWithDrawer>
-      <div className="bg-white min-h-screen pb-20 font-sans">
-        <main className="max-w-[1440px] mx-auto px-6 pt-6 space-y-8">
-          
-          {/* Welcome Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h1 className="text-3xl font-black text-[#1e293b] tracking-tight">
-                Xush kelibsiz, {user?.name || 'Talaba'}! 👋
-              </h1>
-              <p className="text-[#64748b] font-medium">
-                Bugun yangi narsalarni o'rganish uchun ajoyib kun. Progressingizni davom ettiring!
-              </p>
-            </div>
-          </div>
+    <>
+      <NavbarWithDrawer>
+      <div className="bg-[#fcfdff] min-h-screen pb-24 font-sans selection:bg-primary/20">
+        {/* Premium Animated Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute top-[20%] -left-[5%] w-[30%] h-[30%] bg-indigo-500/5 rounded-full blur-[100px]" />
+        </div>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <main className="max-w-[1600px] mx-auto px-6 lg:px-10 pt-6 space-y-10 relative z-10">
+          
+          {/* Ultra-Premium Hero Greeting */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 lg:p-12 text-white shadow-2xl shadow-indigo-500/10"
+          >
+            {/* Background Effects */}
+            <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/20 via-transparent to-transparent pointer-events-none" />
+            
+            <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+              <div className="space-y-6 max-w-2xl">
+                <Badge className="bg-primary/20 text-primary border-primary/30 px-4 py-1.5 rounded-full font-black text-[9px] tracking-[0.3em] backdrop-blur-md uppercase">
+                  Oʻquvchi boshqaruvi
+                </Badge>
+                <h1 className="text-4xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+                  Xush kelibsiz, <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-white">
+                    {user?.name || 'Talaba'}!
+                  </span>
+                </h1>
+                <div className="flex flex-wrap gap-8 pt-2">
+                   <div className="flex flex-col">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Progress</span>
+                      <span className="text-xl font-black">{avgGrade}% oʻrtacha ball</span>
+                   </div>
+                   <div className="w-[1px] h-10 bg-white/10 hidden sm:block" />
+                   <div className="flex flex-col">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Darslar</span>
+                      <span className="text-xl font-black">{totalLessonsViewed} ta o'rganildi</span>
+                   </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-3 w-full lg:w-auto">
+                <Button 
+                  onClick={handleContinue}
+                  className="h-16 px-10 rounded-[1.5rem] bg-white text-[#0f172a] hover:bg-primary hover:text-white font-black text-base gap-3 shadow-xl transition-all duration-500 group"
+                >
+                  Oʻqishni davom ettirish
+                  <Play className="w-5 h-5 fill-current group-hover:scale-125 transition-transform" />
+                </Button>
+                <div className="flex gap-3">
+                   <Button variant="outline" className="flex-1 h-12 rounded-[1rem] bg-white/5 border-white/10 text-white hover:bg-white hover:text-primary font-black text-xs backdrop-blur-md">
+                     Sertifikatlar
+                   </Button>
+                   <Button variant="outline" className="flex-1 h-12 rounded-[1rem] bg-white/5 border-white/10 text-white hover:bg-white hover:text-primary font-black text-xs backdrop-blur-md">
+                     Yutuqlar
+                   </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* New Horizontal Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { label: 'Tugallangan kurslar', value: studentProgress.filter(p => p.overallPercentage >= 100).length, icon: Trophy, color: 'bg-[#fef3c7] text-[#d97706]' },
-              { label: 'Darslar ko\'rildi', value: totalLessonsViewed, icon: BookOpen, color: 'bg-[#e0f2fe] text-[#0284c7]' },
-              { label: 'O\'rtacha ball', value: `${avgGrade}%`, icon: TrendingUp, color: 'bg-[#f3e8ff] text-[#7c3aed]' },
+              { label: 'Tugallangan kurslar', value: studentProgress.filter(p => p.overallPercentage >= 100).length, icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-50' },
+              { label: 'Darslar ko\'rildi', value: totalLessonsViewed, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
+              { label: 'O\'rtacha ball', value: `${avgGrade}%`, icon: TrendingUp, color: 'text-violet-500', bg: 'bg-violet-50' },
               { 
                 label: 'O\'quv vaqti', 
                 value: studentStats?.timeSpent > 3600 
                   ? `${Math.floor(studentStats.timeSpent / 3600)}s ${Math.floor((studentStats.timeSpent % 3600) / 60)}d`
                   : `${Math.floor((studentStats?.timeSpent || 0) / 60)} daqiqa`, 
                 icon: Zap, 
-                color: 'bg-[#dcfce7] text-[#16a34a]' 
+                color: 'text-emerald-500',
+                bg: 'bg-emerald-50'
               },
             ].map((stat, i) => (
               <motion.div 
                 key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white border border-[#f1f5f9] rounded-2xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * i }}
+                className="bg-white border border-slate-100 rounded-[2.5rem] p-8 flex items-center gap-8 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all group"
               >
-                <div className={`w-8 h-8 rounded-lg ${stat.color} flex items-center justify-center shadow-inner`}>
-                  <stat.icon className="w-4 h-4" />
+                <div className={`w-16 h-16 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
+                  <stat.icon className="w-8 h-8" />
                 </div>
                 <div>
-                  <p className="text-[9px] font-black text-[#94a3b8] uppercase tracking-widest mb-0.5">{stat.label}</p>
-                  <p className="text-xl font-black text-[#1e293b] tracking-tight">{stat.value}</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                  <p className="text-3xl font-black text-[#1e293b] tracking-tight">{stat.value}</p>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-12">
             {/* Left Main Content */}
-            <div className="lg:col-span-2 space-y-10">
+            <div className="lg:col-span-2 space-y-16">
               
-              {/* Continue Learning Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[#1e293b] font-black text-lg ml-2">
-                  <Clock className="w-5 h-5 text-[#7c3aed]" />
-                  <span>O'qishni davom ettiring</span>
+              {/* Continue Learning Section - Cinematic */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 text-[#0f172a] font-black text-2xl px-2">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Play className="w-5 h-5 text-primary fill-primary" />
+                  </div>
+                  <span>Oʻqishni davom ettiring</span>
                 </div>
                 
                 <motion.div 
-                  whileHover={{ y: -5 }}
-                  className="relative bg-[#f5f3ff] border border-[#e9e4ff] rounded-[2.5rem] p-8 text-[#1e293b] overflow-hidden shadow-sm"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative bg-[#1e293b] border border-slate-800 rounded-[3.5rem] p-10 lg:p-14 text-white overflow-hidden shadow-2xl shadow-slate-900/20 group"
                 >
-                  <div className="absolute top-0 right-0 w-[40%] h-full opacity-5 pointer-events-none">
-                    <Zap className="w-full h-full fill-primary" />
-                  </div>
+                  <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none bg-gradient-to-l from-primary/40 to-transparent" />
+                  <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-[80px]" />
  
-                   <div className="relative z-10 space-y-6">
-                    <Badge className="bg-primary/10 text-primary border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
-                      Oxirgi ko'rilgan dars
+                   <div className="relative z-10 space-y-10">
+                    <Badge className="bg-primary hover:bg-primary text-white border-none px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
+                      FAOL DARSLIK
                     </Badge>
                     
-                    <div className="space-y-2">
-                      <h2 className="text-4xl font-black leading-tight max-w-[85%] tracking-tight text-[#1e293b]">
+                    <div className="space-y-4">
+                      <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] max-w-[90%] tracking-tight">
                         {studentStats?.lastLesson?.title || "Hali dars boshlanmagan"}
                       </h2>
-                      <div className="flex items-center gap-6 text-[#64748b] text-sm font-bold">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-primary" />
+                      <div className="flex flex-wrap items-center gap-8 text-slate-400 text-lg font-bold">
+                        <div className="flex items-center gap-3">
+                          <Clock className="w-5 h-5 text-primary" />
                           <span>12 minut qoldi</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <BookOpen className="w-4 h-4 text-primary" />
+                        <div className="flex items-center gap-3">
+                          <BookOpen className="w-5 h-5 text-primary" />
                           <span>4-modul, 2-dars</span>
                         </div>
                       </div>
                     </div>
  
-                    <div className="space-y-4 max-w-md">
-                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-[#94a3b8]">
-                        <span>Jami progress: {studentStats?.lastLesson ? 
+                    <div className="space-y-6 max-w-xl">
+                      <div className="flex justify-between text-xs font-black uppercase tracking-widest text-slate-500">
+                        <span>JAMI PROGRESS</span>
+                        <span className="text-primary">{studentStats?.lastLesson ? 
                           `${studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0}%` : 
                           '0%'}</span>
                       </div>
-                      <div className="h-2.5 bg-[#e9e4ff] rounded-full overflow-hidden">
+                      <div className="h-3.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700 p-0.5">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${studentStats?.lastLesson ? 
                             (studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0) : 0}%` }}
-                          className="h-full bg-primary rounded-full" 
+                          className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full shadow-[0_0_15px_rgba(124,58,237,0.5)]" 
                         />
                       </div>
                     </div>
  
                     <Button 
-                      className="bg-primary text-white hover:bg-primary/90 rounded-2xl px-10 h-14 font-black text-base gap-2 shadow-xl shadow-primary/20 transition-all"
+                      className="bg-primary text-white hover:bg-white hover:text-primary rounded-[1.5rem] px-12 h-16 font-black text-lg gap-3 shadow-2xl shadow-primary/20 transition-all duration-500 transform group-hover:scale-105"
                       onClick={handleContinue}
                     >
                       Darsni davom ettirish
-                      <Play className="w-4 h-4 fill-white" />
+                      <Play className="w-5 h-5 fill-current" />
                     </Button>
                   </div>
                 </motion.div>
               </div>
 
               {/* My Courses Section */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between ml-2">
-                  <div className="flex items-center gap-2 text-[#1e293b] font-black text-xl">
-                    <Boxes className="w-6 h-6 text-[#7c3aed]" />
+              <div className="space-y-8">
+                <div className="flex items-center justify-between px-2">
+                  <div className="flex items-center gap-4 text-[#0f172a] font-black text-3xl">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                      <Boxes className="w-7 h-7" />
+                    </div>
                     <span>Sinflar</span>
                   </div>
-                  <Button variant="ghost" onClick={() => navigate('/courses')} className="text-primary font-black text-sm gap-1 hover:bg-primary/5">
-                    Hammasini ko'rish <ChevronRight className="w-4 h-4" />
+                  <Button variant="ghost" onClick={() => navigate('/courses')} className="text-primary font-black text-sm gap-2 hover:bg-primary/5 rounded-xl px-5">
+                    Barcha kurslar <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+ 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   {courses.length > 0 ? courses.slice(0, 4).map((course, i) => {
                     const progress = studentProgress.find(p => p.courseId === course._id);
                     return (
                       <motion.div 
                         key={course._id}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white border border-[#f1f5f9] rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col"
+                        className="bg-white border border-slate-100 rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 group flex flex-col"
                       >
-                        <div className="relative h-56 overflow-hidden">
+                        <div className="relative h-64 overflow-hidden">
                           <img 
                             src={getThumbnail(course)} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                             alt="" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <Badge className="absolute top-5 left-5 bg-white/90 backdrop-blur-md text-primary border-none font-black text-[10px] px-4 py-1.5 rounded-full shadow-lg">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                          <Badge className="absolute top-6 left-6 bg-white/90 backdrop-blur-md text-primary border-none font-black text-[10px] px-5 py-2 rounded-full shadow-xl">
                             {course.category || 'AKADEMIK'}
                           </Badge>
+                          <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white">
+                             <div className="flex items-center gap-2 font-black text-xs uppercase tracking-widest">
+                               <Users className="w-4 h-4 text-primary" />
+                               <span>{course.enrolledStudents?.length || 0} Talaba</span>
+                             </div>
+                             <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center backdrop-blur-sm shadow-xl">
+                               <Play className="w-4 h-4 fill-white" />
+                             </div>
+                          </div>
                         </div>
                         
-                        <div className="p-8 flex-1 flex flex-col space-y-6">
-                          <h4 className="font-black text-[#1e293b] text-xl leading-tight line-clamp-2">
+                        <div className="p-10 flex-1 flex flex-col space-y-8">
+                          <h4 className="font-black text-[#0f172a] text-2xl leading-tight line-clamp-2 min-h-[4rem]">
                             {course.title}
                           </h4>
                           
-                          <div className="space-y-4">
-                            <div className="flex justify-between text-xs font-black text-[#94a3b8] uppercase tracking-[0.1em]">
+                          <div className="space-y-5">
+                            <div className="flex justify-between text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
                               <div className="flex items-center gap-2">
                                 <BookOpen className="w-4 h-4 text-primary" />
-                                <span>{course.lessons?.length || 0} mavzu</span>
+                                <span>{course.lessons?.length || 0} MAVZU</span>
                               </div>
                               <span className="text-primary">{progress?.overallPercentage || 0}%</span>
                             </div>
-                            <div className="h-2 bg-[#f8fafc] rounded-full overflow-hidden border border-[#f1f5f9]">
+                            <div className="h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
                               <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress?.overallPercentage || 0}%` }}
-                                className="h-full bg-primary rounded-full shadow-[0_0_8px_rgba(124,58,237,0.4)]" 
+                                className="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full shadow-lg" 
                               />
                             </div>
                           </div>
-
+ 
                           <Button 
-                            className="w-full rounded-2xl bg-[#f8fafc] hover:bg-primary hover:text-white border-2 border-transparent text-[#1e293b] font-black text-sm h-14 transition-all gap-2"
+                            className="w-full rounded-[1.25rem] bg-slate-50 hover:bg-primary hover:text-white border-none text-[#0f172a] font-black text-sm h-16 transition-all duration-300 gap-2"
                             onClick={() => navigate(`/courses/${course._id}`)}
                           >
-                            Darsni davom ettirish
-                            <ArrowRight className="w-4 h-4" />
+                            Darsni ko'rish
+                            <ChevronRight className="w-5 h-5" />
                           </Button>
                         </div>
                       </motion.div>
                     );
                   }) : (
-                    <div className="col-span-full py-24 text-center space-y-6 bg-white border-2 border-dashed border-[#f1f5f9] rounded-[3rem]">
-                      <div className="w-20 h-20 bg-[#f8fafc] rounded-3xl flex items-center justify-center mx-auto shadow-inner">
-                        <Boxes className="w-10 h-10 text-[#cbd5e1]" />
+                    <div className="col-span-full py-32 text-center space-y-8 bg-white border-2 border-dashed border-slate-100 rounded-[4rem]">
+                      <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto shadow-inner text-slate-300">
+                        <Boxes className="w-12 h-12" />
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-[#1e293b] font-black text-xl">Kurslar hali yo'q</p>
-                        <p className="text-[#64748b] font-medium max-w-xs mx-auto">Siz hali birorta kursga qo'shilmagansiz. Hozirgi kurslarni ko'rib chiqing.</p>
+                      <div className="space-y-3">
+                        <p className="text-[#0f172a] font-black text-2xl">Kurslar hali mavjud emas</p>
+                        <p className="text-slate-500 font-medium max-w-sm mx-auto text-lg">Siz hali birorta kursga qo'shilmagansiz. Hozirgi kurslarni ko'rib chiqing va o'rganishni boshlang.</p>
                       </div>
-                      <Button onClick={() => navigate('/courses')} className="rounded-2xl px-10 h-12 bg-primary font-black">
+                      <Button onClick={() => navigate('/courses')} className="rounded-2xl px-12 h-14 bg-primary font-black text-base shadow-xl shadow-primary/20">
                         Kurslarni ko'rish
                       </Button>
                     </div>
@@ -338,62 +411,89 @@ const StudentDashboard = () => {
                 </div>
               </div>
             </div>
-
+ 
             {/* Right Sidebar */}
-            <div className="space-y-8">
-              <div className="bg-white border border-[#f1f5f9] rounded-[3rem] p-8 shadow-sm">
-                <div className="flex items-center justify-between mb-10">
-                  <h3 className="font-black text-[#1e293b] text-xl tracking-tight">So'nggi harakatlar</h3>
-                  <Badge variant="secondary" className="bg-[#f8fafc] text-[#94a3b8] border-none font-bold">Hammasi</Badge>
+            <div className="space-y-10">
+              <div className="bg-white border border-slate-100 rounded-[3.5rem] p-10 shadow-sm sticky top-24">
+                <div className="flex items-center justify-between mb-12">
+                  <h3 className="font-black text-[#0f172a] text-2xl tracking-tight">So'nggi harakatlar</h3>
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                    <Clock className="w-5 h-5" />
+                  </div>
                 </div>
-
-                <div className="space-y-10">
+ 
+                <div className="space-y-12">
                   {studentProgress.length > 0 ? studentProgress.slice(0, 4).map((prog, i) => (
-                    <div key={i} className="flex gap-5 relative">
-                      {i !== 3 && <div className="absolute left-[23px] top-12 w-[2px] h-10 bg-[#f8fafc]" />}
-                      <div className={`w-12 h-12 rounded-2xl ${i % 2 === 0 ? 'bg-[#f0fdf4] text-[#10b981]' : 'bg-[#eff6ff] text-[#3b82f6]'} flex items-center justify-center shrink-0 shadow-sm z-10 border border-white`}>
-                        {i % 2 === 0 ? <CheckCircle2 className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
+                    <div key={i} className="flex gap-6 relative group cursor-pointer">
+                      {i !== 3 && <div className="absolute left-[27px] top-16 w-[2px] h-12 bg-slate-50 group-hover:bg-primary/20 transition-colors" />}
+                      <div className={`w-14 h-14 rounded-2xl ${i % 2 === 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'} flex items-center justify-center shrink-0 shadow-sm z-10 border-4 border-white transition-transform group-hover:scale-110`}>
+                        {i % 2 === 0 ? <CheckCircle2 className="w-6 h-6" /> : <BookOpen className="w-6 h-6" />}
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <h4 className="text-sm font-black text-[#334155] leading-tight">
-                          "{prog.courseTitle}" kursi o'rganilmoqda
+                      <div className="flex-1 space-y-2 pt-1">
+                        <h4 className="text-base font-black text-[#1e293b] leading-tight group-hover:text-primary transition-colors">
+                          "{prog.courseTitle}"
                         </h4>
-                        <p className="text-[11px] font-black text-[#94a3b8] uppercase tracking-wider">{prog.overallPercentage}% yakunlandi</p>
+                        <div className="flex items-center gap-3">
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{prog.overallPercentage}% yakunlandi</p>
+                           <div className="w-1 h-1 rounded-full bg-slate-300" />
+                           <p className="text-[10px] font-black text-primary uppercase">2 soat avval</p>
+                        </div>
                       </div>
                     </div>
                   )) : (
-                    <div className="text-center py-10 space-y-3">
-                      <Clock className="w-10 h-10 text-[#cbd5e1] mx-auto opacity-50" />
-                      <p className="text-xs font-black text-[#94a3b8] uppercase">Harakatlar yo'q</p>
+                    <div className="text-center py-16 space-y-4">
+                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto opacity-50 text-slate-300">
+                        <TrendingUp className="w-8 h-8" />
+                      </div>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Harakatlar yo'q</p>
                     </div>
                   )}
                 </div>
+ 
+                {/* Upgrade/Promo Card */}
+                <div className="mt-16 p-8 bg-slate-50 rounded-[2rem] border border-slate-100 text-center space-y-4">
+                   <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto -mt-14 border border-slate-100">
+                      <Sparkles className="w-6 h-6 text-primary" />
+                   </div>
+                   <h4 className="font-black text-[#0f172a]">MultiEdu Academy</h4>
+                   <p className="text-xs font-medium text-slate-500">Eng so'nggi bilimlar va yangiliklardan doimiy boxabar bo'ling.</p>
+                   <Button variant="outline" className="w-full rounded-xl font-black text-[10px] uppercase tracking-widest border-2">Batafsil</Button>
+                </div>
               </div>
-
-              {/* AI Assistant Widget */}
+ 
+              {/* AI Assistant Widget - Large & Floating Effect */}
               <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-br from-[#7c3aed] to-[#4f46e5] rounded-[2.5rem] p-7 text-white space-y-6 shadow-xl shadow-primary/30 relative overflow-hidden group cursor-pointer"
+                whileHover={{ y: -10 }}
+                className="bg-gradient-to-br from-[#7c3aed] via-[#6d28d9] to-[#4f46e5] rounded-[3rem] p-10 text-white space-y-8 shadow-2xl shadow-primary/40 relative overflow-hidden group cursor-pointer"
                 onClick={() => setIsAiModalOpen(true)}
               >
-                <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-2xl border border-white/20">
-                  <Sparkles className="w-7 h-7" />
+                
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-2xl border border-white/30 group-hover:rotate-12 transition-transform duration-500">
+                  <Sparkles className="w-9 h-9 text-white" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-black tracking-tight">AI Tutor</h3>
-                  <p className="text-white/80 text-[13px] font-bold leading-relaxed">
-                    Tushunmagan savollaringizni AI yordamchidan so'rang. 24/7 xizmatingizda.
+                
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-black tracking-tight">AI Tyutor</h3>
+                  <p className="text-white/80 text-base font-bold leading-relaxed">
+                    Tushunmagan savollaringizni, istalgan vaqtda AI yordamchidan so'rang. 24/7 siz bilan birga.
                   </p>
                 </div>
-                <Button className="w-full bg-white text-primary hover:bg-white/90 rounded-xl h-11 font-black text-sm gap-2 shadow-xl shadow-black/10">
-                  Savol berish
-                  <ArrowRight className="w-4 h-4" />
+                
+                <Button className="w-full bg-white text-primary hover:bg-slate-100 rounded-2xl h-16 font-black text-lg gap-3 shadow-2xl shadow-black/20">
+                  Suhbatni boshlash
+                  <MessageCircle className="w-6 h-6" />
                 </Button>
               </motion.div>
             </div>
           </div>
         </main>
+ 
+        <div className="pt-24 pb-12 text-center">
+          <p className="text-[#94a3b8] text-[10px] font-black uppercase tracking-[0.4em] opacity-60">
+            © 2026 MultiEdu Premium EdTech • Bilim platformasi
+          </p>
+        </div>
+      </div>
 
         {/* AI Tutor Modal */}
         <AnimatePresence>
@@ -472,13 +572,8 @@ const StudentDashboard = () => {
           )}
         </AnimatePresence>
 
-        <div className="pt-10 pb-4 text-center">
-          <p className="text-[#94a3b8] text-[10px] font-black uppercase tracking-[0.2em]">
-            © 2026 MultiEdu Premium Learning • Bilim markazi
-          </p>
-        </div>
-      </div>
-    </NavbarWithDrawer>
+      </NavbarWithDrawer>
+    </>
   );
 };
 

@@ -112,11 +112,18 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // @route   GET api/lessons/:id
-// @desc    Get lesson by ID
+// @desc    Get lesson by ID (Checks both regular and official lessons)
 // @access  Private
 router.get('/:id', auth, async (req, res) => {
     try {
-        const lesson = await Lesson.findById(req.params.id).populate('instructor', 'name email');
+        let lesson = await Lesson.findById(req.params.id).populate('instructor', 'name email');
+        
+        // Fallback to OfficialLesson
+        if (!lesson) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            lesson = await OfficialLesson.findById(req.params.id);
+        }
+
         if (!lesson) {
             return res.status(404).json({ msg: 'Dars topilmadi' });
         }
@@ -155,17 +162,27 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // @route   PATCH api/lessons/:id/view
-// @desc    Mark a lesson as viewed
+// @desc    Mark a lesson as viewed (Supports both regular and official lessons)
 // @access  Private (Student)
 router.patch('/:id/view', auth, async (req, res) => {
     try {
-        const lesson = await Lesson.findById(req.params.id);
+        let lesson = await Lesson.findById(req.params.id);
+        let isOfficial = false;
+
+        if (!lesson) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            lesson = await OfficialLesson.findById(req.params.id);
+            if (lesson) isOfficial = true;
+        }
+
         if (!lesson) {
             return res.status(404).json({ msg: 'Dars topilmadi' });
         }
 
+        const ProgressModel = isOfficial ? require('../models/OfficialLessonProgress') : require('../models/LessonProgress');
+
         // Check if progress already exists
-        let progress = await LessonProgress.findOne({
+        let progress = await ProgressModel.findOne({
             student: req.user.id,
             lesson: req.params.id
         });
@@ -174,13 +191,20 @@ router.patch('/:id/view', auth, async (req, res) => {
             return res.json(progress);
         }
 
-        progress = new LessonProgress({
+        progress = new ProgressModel({
             student: req.user.id,
             lesson: req.params.id,
             course: lesson.course
         });
 
         await progress.save();
+
+        // Also update User's lastLesson (keeping it in User model for general tracking)
+        const User = require('../models/User');
+        // Note: lastLesson in User can point to either ID, but populate won't work easily if they are in different collections
+        // However, we'll keep it for simple ID storage.
+        await User.findByIdAndUpdate(req.user.id, { lastLesson: req.params.id });
+
         res.json(progress);
     } catch (err) {
         console.error(err.message);

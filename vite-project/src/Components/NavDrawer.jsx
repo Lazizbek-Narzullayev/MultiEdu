@@ -403,7 +403,7 @@ const NavbarWithDrawer = ({ children }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }} onClick={handleProfileClick}>
               <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
                 <Typography variant="body2" sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.85rem' }}>{user?.name}</Typography>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: '#94a3b8', fontSize: '0.75rem' }}>{user?.role === 'student' ? 'O\'quvchi' : 'O\'qituvchi'}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#94a3b8', fontSize: '0.75rem' }}>{user?.role === 'student' ? "O'quvchi" : "O'qituvchi"}</Typography>
               </Box>
               <Avatar 
                 src={user?.avatarUrl}

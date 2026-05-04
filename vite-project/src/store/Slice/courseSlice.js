@@ -41,11 +41,24 @@ export const joinCourse = createAsyncThunk('courses/join', async (joinCode, { ge
     }
 });
 
-// Get official courses
+// Get official courses from NEW model
 export const getOfficialCourses = createAsyncThunk('courses/getOfficial', async (_, { getState, rejectWithValue }) => {
     try {
         const { auth } = getState();
-        const res = await axios.get(`${API_BASE_URL}/courses/official`, {
+        const res = await axios.get(`${API_BASE_URL}/official-courses`, {
+            headers: { 'x-auth-token': auth.user.token }
+        });
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response.data.msg);
+    }
+});
+
+// Get official course detail from NEW model
+export const getOfficialCourseById = createAsyncThunk('courses/getOfficialById', async (id, { getState, rejectWithValue }) => {
+    try {
+        const { auth } = getState();
+        const res = await axios.get(`${API_BASE_URL}/official-courses/${id}`, {
             headers: { 'x-auth-token': auth.user.token }
         });
         return res.data;
@@ -214,6 +227,10 @@ const courseSlice = createSlice({
                 state.error = null;
             })
             .addCase(getCourseById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentCourse = action.payload;
+            })
+            .addCase(getOfficialCourseById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.currentCourse = action.payload;
             })

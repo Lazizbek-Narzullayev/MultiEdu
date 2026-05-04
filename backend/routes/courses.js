@@ -113,33 +113,38 @@ router.get('/student/dashboard-stats', auth, async (req, res) => {
         const Submission = require('../models/Submission');
         const User = require('../models/User');
 
-        // 1. Find all Admin courses
-        // We'll populate the teacher to check their role
+        const OfficialCourse = require('../models/OfficialCourse');
+        const OfficialLessonProgress = require('../models/OfficialLessonProgress');
+
+        // 1. Count completed topics from Official courses
+        const completedTopics = await OfficialLessonProgress.countDocuments({
+            student: req.user.id
+        });
+
+        // 2. Count completed assignments (Keeping existing logic for now or updating if needed)
+        // For simplicity, we'll keep the admin course IDs logic for assignments if they are still in Course model
         const allCourses = await Course.find().populate('teacher', 'role');
         const adminCourseIds = allCourses
             .filter(c => c.teacher && (c.teacher.role === 'admin' || c.teacher.role === 'super-admin'))
             .map(c => c._id);
 
-        // 2. Count completed topics in these Admin courses
-        const completedTopics = await LessonProgress.countDocuments({
-            student: req.user.id,
-            course: { $in: adminCourseIds }
-        });
-
-        // 3. Count completed assignments in these Admin courses
         const completedAssignments = await Submission.countDocuments({
             studentId: req.user.id,
             courseId: { $in: adminCourseIds }
         });
 
-        // 4. Get User's timeSpent and lastLesson
-        const user = await User.findById(req.user.id).populate('lastLesson', 'title');
+        // 3. Get last official lesson
+        const lastAdminProgress = await OfficialLessonProgress.findOne({
+            student: req.user.id
+        }).sort({ viewedAt: -1 }).populate('lesson', 'title course');
+
+        const user = await User.findById(req.user.id);
 
         res.json({
             completedTopics,
             completedAssignments,
             timeSpent: user.timeSpent || 0,
-            lastLesson: user.lastLesson
+            lastLesson: lastAdminProgress ? lastAdminProgress.lesson : null
         });
     } catch (err) {
         console.error('Dashboard stats error:', err.message);

@@ -171,9 +171,13 @@ const LessonViewer = () => {
         }, 100);
     };
 
+    const [isVideoStarted, setIsVideoStarted] = useState(false);
+    const [isPlayerReady, setIsPlayerReady] = useState(false);
+
     const onPlayerReady = (event) => {
         setDuration(event.target.getDuration());
         playerRef.current = event.target;
+        setIsPlayerReady(true);
     };
 
     useEffect(() => {
@@ -207,14 +211,22 @@ const LessonViewer = () => {
     }, [isPlaying, videoCompleted, isTeacher, id]);
 
     const onPlayerStateChange = (event) => {
-        if (event.data === 1) setIsPlaying(true);
-        else setIsPlaying(false);
-        
-        if (event.data === 0) { // ENDED
+        if (event.data === 1) { // PLAYING
+            setIsPlaying(true);
+            setIsVideoStarted(true);
+        }
+        else if (event.data === 2) { // PAUSED
+            setIsPlaying(false);
+        }
+        else if (event.data === 0) { // ENDED
+            setIsPlaying(false);
             setVideoCompleted(true);
             if (!lesson.quiz || lesson.quiz.length === 0) {
                 markAsViewed();
             }
+        }
+        else {
+            setIsPlaying(false);
         }
     };
 
@@ -278,6 +290,12 @@ const LessonViewer = () => {
     };
 
     const videoId = getYouTubeId(lesson.videoUrl);
+
+    const getThumbnail = () => {
+        if (lesson.thumbnailUrl && lesson.thumbnailUrl !== 'no-image') return lesson.thumbnailUrl;
+        if (videoId) return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800';
+    };
     
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
@@ -326,6 +344,19 @@ const LessonViewer = () => {
         return sentences[currentSegmentIndex] || "";
     };
 
+    const handleStartVideo = () => {
+        if (playerRef.current) {
+            setIsVideoStarted(true);
+            playerRef.current.playVideo();
+        } else {
+            // If player not ready yet, wait a bit and try again
+            setIsVideoStarted(true);
+            setTimeout(() => {
+                playerRef.current?.playVideo();
+            }, 500);
+        }
+    };
+
     const hasQuiz = lesson.quiz && lesson.quiz.length > 0;
     const hasPassedQuiz = lesson.viewedBy?.includes(user?._id) || isTeacher;
 
@@ -336,9 +367,13 @@ const LessonViewer = () => {
                     <div className="grid lg:grid-cols-12 gap-8">
                         {/* Left Column: Video & Metadata */}
                         <div className="lg:col-span-8 space-y-6">
-                            {/* Video Player */}
-                            <div className="relative bg-black rounded-3xl overflow-hidden aspect-video shadow-lg border border-border group">
-                                {videoId ? (
+                            {/* Video Player Container */}
+                            <div id="video-container" className="relative bg-black rounded-3xl overflow-hidden aspect-video shadow-2xl border border-border group">
+                                {/* Video Player Wrapper with Cinema Masks */}
+                                <div className={`w-full h-full relative overflow-hidden transition-all duration-700 ${isVideoStarted ? 'opacity-100' : 'opacity-0'}`}>
+                                    {/* Top Mask (Hides Title) */}
+                                    <div className="absolute top-0 left-0 right-0 h-[8%] bg-black z-[10] pointer-events-none" />
+                                    
                                     <YouTube
                                         videoId={videoId}
                                         opts={{
@@ -347,34 +382,75 @@ const LessonViewer = () => {
                                             playerVars: { 
                                                 rel: 0, 
                                                 modestbranding: 1,
-                                                controls: 0, // Hiding YouTube controls to prevent clicking "Watch on YouTube"
+                                                controls: 0, 
                                                 disablekb: 1,
                                                 fs: 0,
-                                                iv_load_policy: 3
+                                                iv_load_policy: 3,
+                                                autoplay: 0,
+                                                origin: window.location.origin,
+                                                widget_referrer: window.location.href
                                             },
                                         }}
                                         onReady={onPlayerReady}
                                         onStateChange={onPlayerStateChange}
-                                        className="w-full h-full absolute inset-0"
+                                        className="w-[110%] h-[110%] absolute -top-[5%] -left-[5%] pointer-events-none select-none z-[1]"
                                     />
-                                ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50">
-                                        <Play className="w-16 h-16 mb-4 opacity-20" />
-                                        <p>Video mavjud emas</p>
-                                    </div>
+
+                                    {/* Bottom Mask (Hides Logo/Progress) */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-[8%] bg-black z-[10] pointer-events-none" />
+                                </div>
+
+                                {/* Custom Poster Overlay (Initial Start) */}
+                                <AnimatePresence>
+                                    {!isVideoStarted && videoId && (
+                                        <motion.div 
+                                            initial={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="absolute inset-0 z-30 cursor-pointer group/poster bg-black"
+                                            onClick={handleStartVideo}
+                                        >
+                                            <img 
+                                                src={getThumbnail()} 
+                                                alt="Poster" 
+                                                className="w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover/poster:scale-105"
+                                            />
+                                            <div className="absolute inset-0 bg-black/20" />
+                                            
+                                            {/* Custom Play Button */}
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl group-hover/poster:scale-110 transition-all duration-300 ring-8 ring-primary/20">
+                                                    {!isPlayerReady ? (
+                                                        <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    ) : (
+                                                        <Play className="w-12 h-12 fill-current ml-1" />
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Badge Overlay */}
+                                            <div className="absolute top-8 left-8 flex items-center gap-2">
+                                                <div className="px-4 py-2 bg-primary/90 backdrop-blur-md rounded-xl text-[10px] font-black text-white tracking-widest uppercase shadow-lg">
+                                                    DARS #{lesson.module || "1"}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Transparent Click Overlay (Play/Pause Toggle) */}
+                                {isVideoStarted && (
+                                    <div className="absolute inset-0 z-[5] bg-transparent" onClick={() => {
+                                        if (isPlaying) playerRef.current?.pauseVideo();
+                                        else playerRef.current?.playVideo();
+                                    }} />
                                 )}
 
-                                {/* Transparent Overlay to block clicks on YouTube logo/links */}
-                                <div className="absolute inset-0 z-[5] bg-transparent" onClick={() => {
-                                    if (isPlaying) playerRef.current?.pauseVideo();
-                                    else playerRef.current?.playVideo();
-                                }} />
-
                                 {/* Custom Progress Bar Overlay */}
-                                <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className={`absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/80 to-transparent transition-all duration-500 ${isVideoStarted ? 'opacity-0 group-hover:opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                                     <div className="flex items-center gap-3">
-                                        <button onClick={() => isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo()} className="text-white">
-                                            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                                        <button onClick={() => isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo()} className="text-white hover:scale-110 transition-transform">
+                                            {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                                         </button>
                                         <div className="flex-1 h-1.5 bg-white/20 rounded-full relative overflow-hidden">
                                             <div 
@@ -385,12 +461,28 @@ const LessonViewer = () => {
                                         <span className="text-[10px] font-bold text-white tabular-nums">
                                             {formatTime(currentTime)} / {formatTime(duration)}
                                         </span>
+                                        
                                         <button 
                                             onClick={() => setShowAiSubtitles(!showAiSubtitles)} 
-                                            className={`transition-colors ${showAiSubtitles ? 'text-primary' : 'text-white/60 hover:text-white'}`}
-                                            title="AI Subtitrlar"
+                                            className={`transition-all hover:scale-110 ${showAiSubtitles ? 'text-primary' : 'text-white/60 hover:text-white'}`}
+                                            title="AI Subtitrlar (Transkript)"
                                         >
                                             <Languages className="w-5 h-5" />
+                                        </button>
+
+                                        <button 
+                                            onClick={() => {
+                                                const container = document.getElementById('video-container');
+                                                if (document.fullscreenElement) {
+                                                    document.exitFullscreen();
+                                                } else {
+                                                    container?.requestFullscreen();
+                                                }
+                                            }} 
+                                            className="text-white/60 hover:text-white transition-all hover:scale-110"
+                                            title="To'liq ekran"
+                                        >
+                                            <Maximize className="w-5 h-5" />
                                         </button>
                                     </div>
                                 </div>
@@ -402,9 +494,9 @@ const LessonViewer = () => {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[8] w-[80%] text-center"
+                                            className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[8] w-[85%] text-center"
                                         >
-                                            <span className="bg-black/60 backdrop-blur-md text-white px-6 py-2 rounded-xl text-sm md:text-base font-medium border border-white/10 shadow-xl inline-block">
+                                            <span className="bg-black/70 backdrop-blur-xl text-white px-8 py-3 rounded-2xl text-sm md:text-lg font-semibold border border-white/10 shadow-2xl inline-block leading-relaxed">
                                                 {getActiveSubtitle()}
                                             </span>
                                         </motion.div>
@@ -412,15 +504,16 @@ const LessonViewer = () => {
                                 </AnimatePresence>
 
                                 {/* Lock Indicator */}
-                                {!videoCompleted && (
+                                {!videoCompleted && isVideoStarted && (
                                     <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                                        <Badge className="bg-amber-500/90 hover:bg-amber-500 backdrop-blur-sm text-white border-0 shadow-lg gap-1.5 px-3 py-1 text-xs">
+                                        <Badge className="bg-amber-500/90 hover:bg-amber-500 backdrop-blur-sm text-white border-0 shadow-lg gap-1.5 px-3 py-1 text-xs font-bold">
                                             <Lock className="w-3 h-3" />
                                             O'tkazish cheklangan
                                         </Badge>
                                     </div>
                                 )}
                             </div>
+
 
                             {/* Lesson Metadata */}
                             <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm">
