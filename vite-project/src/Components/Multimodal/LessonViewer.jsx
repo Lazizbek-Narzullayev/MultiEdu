@@ -47,6 +47,7 @@ const LessonViewer = () => {
     // Layout State
     const [activeTab, setActiveTab] = useState('3d');
     const [nextLesson, setNextLesson] = useState(null);
+    const [isChatExpanded, setIsChatExpanded] = useState(false);
 
     const playerRef = useRef(null);
     const lastTimeRef = useRef(0);
@@ -516,44 +517,57 @@ const LessonViewer = () => {
 
 
                             {/* Lesson Metadata */}
-                            <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm">
-                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h1 className="text-2xl md:text-3xl font-black text-foreground leading-tight">
-                                                    {lesson.title}
-                                                </h1>
-                                                {isTeacher && (
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="w-8 h-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                                        onClick={() => navigate(`/lessons/edit/${id}`)}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                {lesson.course?.title || "Kurs"} • {lesson.module || "Modul"}, dars
-                                            </p>
+                            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl transition-all group-hover:bg-primary/10" />
+                                
+                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10 relative z-10">
+                                    <div className="flex-1 space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight tracking-tight">
+                                                {lesson.title}
+                                            </h1>
+                                            {isTeacher && (
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="w-10 h-10 rounded-xl text-slate-400 hover:text-primary hover:bg-primary/5 border border-slate-100"
+                                                    onClick={() => navigate(`/lessons/edit/${id}`)}
+                                                >
+                                                    <Edit className="w-5 h-5" />
+                                                </Button>
+                                            )}
                                         </div>
-                                        <Badge variant="secondary" className="w-fit text-sm px-4 py-1.5 font-bold bg-primary/10 text-primary">
-                                            Ko'rilmoqda
-                                        </Badge>
+                                        <div className="flex items-center gap-4">
+                                            <Badge variant="outline" className="px-4 py-1.5 rounded-full bg-slate-50 border-slate-200 text-slate-600 font-bold text-xs">
+                                                {lesson.course?.title || "Kurs"}
+                                            </Badge>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                                            <span className="text-sm font-black text-primary uppercase tracking-widest">
+                                                {lesson.module || "1"}-Modul, Dars
+                                            </span>
+                                        </div>
                                     </div>
+                                    <Badge className="w-fit text-xs px-6 py-2.5 font-black bg-[#7c3aed] text-white rounded-full shadow-lg shadow-indigo-500/20 uppercase tracking-widest">
+                                        Hozir koʻrilmoqda
+                                    </Badge>
+                                </div>
 
-                                <div className="py-6 border-t border-b border-border mb-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-bold text-lg text-foreground">Ma'ruza Matni</h3>
+                                <div className="space-y-8 relative z-10">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                                <FileText className="w-5 h-5" />
+                                            </div>
+                                            <h3 className="font-black text-xl text-slate-900">Maʼruza Matni</h3>
+                                        </div>
                                         <Button 
                                             variant="outline" 
                                             size="sm" 
-                                            className={`rounded-xl ${isSpeaking && !isPaused ? 'text-white bg-primary border-primary' : 'text-primary border-primary/20 bg-primary/5 hover:bg-primary/10'}`}
+                                            className={`rounded-2xl h-12 px-6 font-black text-xs transition-all duration-300 ${isSpeaking && !isPaused ? 'text-white bg-indigo-600 border-indigo-600 shadow-lg shadow-indigo-500/30' : 'text-indigo-600 border-indigo-100 bg-indigo-50 hover:bg-indigo-100'}`}
                                             onClick={toggleSpeech}
                                         >
                                             {isSpeaking && !isPaused ? (
-                                                <><Pause className="w-4 h-4 mr-2" /> To'xtatib turish</>
+                                                <><Pause className="w-4 h-4 mr-2" /> Toʻxtatib turish</>
                                             ) : isPaused ? (
                                                 <><Play className="w-4 h-4 mr-2" /> Davom etish</>
                                             ) : (
@@ -561,8 +575,8 @@ const LessonViewer = () => {
                                             )}
                                         </Button>
                                     </div>
-                                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 max-h-[300px] overflow-y-auto custom-scrollbar pr-4">
-                                        <p className="whitespace-pre-wrap leading-relaxed">
+                                    <div className="prose prose-slate max-w-none text-slate-600 max-h-[400px] overflow-y-auto custom-scrollbar pr-6">
+                                        <p className="whitespace-pre-wrap leading-relaxed text-lg font-medium">
                                             {lesson.textContent || lesson.description || "Ushbu dars uchun matn kiritilmagan."}
                                         </p>
                                     </div>
@@ -570,118 +584,128 @@ const LessonViewer = () => {
                             </div>
                         </div>
 
-                        {/* Right Column: Tabs */}
-                        <div className="lg:col-span-4 h-[calc(100vh-100px)] sticky top-20 flex flex-col gap-4">
-                            <div className="bg-card border border-border rounded-3xl flex-1 flex flex-col shadow-sm overflow-hidden">
-                                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col w-full h-full min-h-0">
-                                    <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm z-10">
-                                        <TabsList className="grid grid-cols-3 gap-2 w-full h-[54px] bg-secondary/40 p-1.5 rounded-full">
-                                            <TabsTrigger value="3d" className="rounded-full text-xs sm:text-sm h-full data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:shadow-sm" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
-                                                <Cuboid className="w-4 h-4 mr-1.5" />
+                        {/* Right Column: Interactive Content */}
+                        <div className="lg:col-span-4 lg:h-[calc(100vh-120px)] lg:sticky lg:top-24 flex flex-col gap-6">
+                            <div className="bg-white border border-slate-200 rounded-[3rem] flex-1 flex flex-col shadow-sm overflow-hidden relative">
+                                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">
+                                    <div className="p-6 border-b border-slate-100 bg-white/80 backdrop-blur-md z-10">
+                                        <TabsList className="grid grid-cols-3 gap-3 w-full h-[60px] bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                                            <TabsTrigger value="3d" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
+                                                <Cuboid className="w-4 h-4 mr-2" />
                                                 <span>3D</span>
                                             </TabsTrigger>
-                                            <TabsTrigger value="fayllar" className="rounded-full text-xs sm:text-sm h-full data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:shadow-sm">
-                                                <FileText className="w-4 h-4 mr-1.5" />
+                                            <TabsTrigger value="fayllar" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
+                                                <FileText className="w-4 h-4 mr-2" />
                                                 <span>Fayllar</span>
                                             </TabsTrigger>
-                                            <TabsTrigger value="chat" className="rounded-full text-xs sm:text-sm h-full data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:shadow-sm">
-                                                <MessageCircle className="w-4 h-4 mr-1.5" />
+                                            <TabsTrigger value="chat" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
+                                                <MessageCircle className="w-4 h-4 mr-2" />
                                                 <span>Chat</span>
                                             </TabsTrigger>
                                         </TabsList>
                                     </div>
 
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                                        <TabsContent value="3d" className="m-0 h-full">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="font-bold text-lg">3D Model</h3>
-                                                <Badge variant="outline" className="bg-primary/5">AR Tayyor</Badge>
-                                            </div>
+                                    <div className="flex-1 p-0 overflow-hidden">
+                                        <TabsContent value="3d" className="m-0 h-full flex flex-col p-6">
                                             {(lesson.model3dUrl || lesson.interactiveUrl) ? (
-                                                <div className="h-[300px] sm:h-[400px] w-full bg-secondary/30 rounded-2xl overflow-hidden border border-border">
+                                                <div className="flex-1 w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-inner relative group">
                                                     <ModelViewer model={{ url: lesson.model3dUrl || lesson.interactiveUrl }} />
+                                                    <div className="absolute top-4 left-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none font-bold text-[10px] px-3 py-1 rounded-lg">
+                                                            3D ENGINE v2.0
+                                                        </Badge>
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                                                    <Cuboid className="w-12 h-12 mb-4 opacity-20" />
-                                                    <p>Bu dars uchun 3D model yo'q</p>
+                                                <div className="flex flex-col items-center justify-center h-full text-slate-300 py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                                                    <Cuboid className="w-16 h-16 mb-4 opacity-10" />
+                                                    <p className="font-black text-xs uppercase tracking-widest">Model mavjud emas</p>
                                                 </div>
                                             )}
                                         </TabsContent>
 
-
-
-                                        <TabsContent value="fayllar" className="m-0 space-y-4">
-                                            <h3 className="font-bold text-lg mb-6">Qo'shimcha resurslar</h3>
-                                            
-                                            {lesson.documentUrl && (
-                                                <div className="flex items-center gap-4 p-4 bg-secondary/30 rounded-2xl border border-border group hover:bg-secondary/50 transition-all cursor-pointer">
-                                                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
-                                                        <FileText className="w-6 h-6" />
+                                        <TabsContent value="fayllar" className="m-0 space-y-4 p-6 overflow-y-auto custom-scrollbar">
+                                            <div className="space-y-3">
+                                                {lesson.documentUrl && (
+                                                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">
+                                                        <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
+                                                            <FileText className="w-5 h-5" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-black text-xs text-slate-900 truncate">Dars taqdimoti</p>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">PDF</p>
+                                                        </div>
+                                                        <Button size="sm" variant="ghost" className="h-8 rounded-lg font-black text-[9px] uppercase tracking-widest hover:text-rose-500" onClick={() => window.open(lesson.documentUrl)}>
+                                                            Yuklash
+                                                        </Button>
                                                     </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-bold text-foreground truncate">Dars taqdimoti</p>
-                                                        <p className="text-xs text-muted-foreground">PDF Fayl</p>
+                                                )}
+
+                                                {lesson.audioUrl && (
+                                                    <div className="flex flex-col gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
+                                                                <Volume2 className="w-5 h-5" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="font-black text-xs text-slate-900 truncate">Audio podkast</p>
+                                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">MP3</p>
+                                                            </div>
+                                                        </div>
+                                                        <audio src={lesson.audioUrl} controls className="h-8 w-full scale-[0.9] origin-left" />
                                                     </div>
-                                                    <Button size="sm" variant="ghost" onClick={() => window.open(lesson.documentUrl)}>
-                                                        Ochish
+                                                )}
+
+                                                {!lesson.documentUrl && !lesson.audioUrl && (
+                                                    <div className="flex flex-col items-center justify-center py-10 text-slate-300">
+                                                        <FileText className="w-12 h-12 mb-3 opacity-10" />
+                                                        <p className="font-black text-[10px] uppercase tracking-widest text-center">Fayllar yoʻq</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </TabsContent>
+
+                                        <TabsContent value="chat" className="m-0 h-full flex flex-col p-6 overflow-hidden">
+                                            <div className="flex items-center justify-between mb-4 shrink-0">
+                                                <div>
+                                                    <h3 className="font-black text-sm text-slate-900 uppercase tracking-widest">Muhokama</h3>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Badge className="bg-indigo-50 text-indigo-600 border-none font-black text-[9px] px-2 py-0.5 rounded-full">{discussionMessages.length}</Badge>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="w-7 h-7 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5"
+                                                        onClick={() => setIsChatExpanded(true)}
+                                                    >
+                                                        <Maximize className="w-3.5 h-3.5" />
                                                     </Button>
                                                 </div>
-                                            )}
-
-                                            {lesson.audioUrl && (
-                                                <div className="flex items-center gap-4 p-4 bg-secondary/30 rounded-2xl border border-border group hover:bg-secondary/50 transition-all">
-                                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                                                        <Volume2 className="w-6 h-6" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-bold text-foreground truncate">Audio podkast</p>
-                                                        <audio src={lesson.audioUrl} controls className="h-8 mt-2 w-full max-w-full" />
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {!lesson.documentUrl && !lesson.audioUrl && (
-                                                <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
-                                                    <FileText className="w-12 h-12 mb-4 opacity-20" />
-                                                    <p>Qo'shimcha fayllar mavjud emas</p>
-                                                </div>
-                                            )}
-                                        </TabsContent>
-
-                                        <TabsContent value="chat" className="m-0 h-full flex flex-col">
-                                            <div className="flex items-center justify-between mb-4 shrink-0">
-                                                <h3 className="font-bold text-lg">Umumiy Chat</h3>
-                                                <Badge variant="secondary" className="bg-secondary">{discussionMessages.length} xabar</Badge>
                                             </div>
                                             
-                                            <div className="flex-1 min-h-[300px] overflow-y-auto space-y-4 pr-2 custom-scrollbar mb-4">
+                                            <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar mb-4">
                                                 {discussionMessages.length === 0 ? (
-                                                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
-                                                        <MessageCircle className="w-10 h-10 mb-3 opacity-20" />
-                                                        Hozircha xabarlar yo'q. Birinchi bo'lib fikr bildiring!
+                                                    <div className="flex flex-col items-center justify-center h-full text-slate-300 text-center px-4">
+                                                        <MessageCircle className="w-12 h-12 mb-3 opacity-10" />
+                                                        <p className="font-black text-[10px] uppercase tracking-widest">Xabarlar yoʻq</p>
                                                     </div>
                                                 ) : (
                                                     discussionMessages.map((msg) => (
-                                                        <div key={msg._id} className={`flex gap-3 ${msg.sender?._id === user?._id ? 'flex-row-reverse' : ''}`}>
-                                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
-                                                                {msg.sender?.name?.[0]}
-                                                            </div>
-                                                            <div className={`space-y-1 max-w-[85%] ${msg.sender?._id === user?._id ? 'items-end' : ''}`}>
-                                                                <div className={`p-3 rounded-2xl text-sm ${
+                                                        <div key={msg._id} className={`flex gap-2 ${msg.sender?._id === user?._id ? 'flex-row-reverse' : ''}`}>
+                                                            <div className={`space-y-1 max-w-[90%] ${msg.sender?._id === user?._id ? 'items-end text-right' : ''}`}>
+                                                                <div className={`p-2.5 rounded-xl text-[11px] font-medium shadow-sm ${
                                                                     msg.sender?._id === user?._id 
-                                                                        ? 'bg-primary text-primary-foreground rounded-tr-none' 
-                                                                        : 'bg-secondary text-foreground rounded-tl-none'
+                                                                        ? 'bg-[#7c3aed] text-white rounded-tr-none' 
+                                                                        : 'bg-slate-50 border border-slate-100 text-slate-700 rounded-tl-none'
                                                                 }`}>
                                                                     {msg.text}
                                                                 </div>
-                                                                <p className="text-[10px] text-muted-foreground font-medium px-1 flex items-center gap-1.5 mt-1">
+                                                                <div className="flex items-center gap-2 px-1 text-[8px] font-black uppercase text-slate-400">
                                                                     <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                                    <span>•</span>
-                                                                    <span className={msg.sender?.role === 'teacher' || msg.sender?.role === 'admin' ? 'text-primary' : 'text-amber-500'}>
-                                                                        {msg.sender?.role === 'teacher' || msg.sender?.role === 'admin' ? "O'qituvchi" : "O'quvchi"}
+                                                                    <span className={msg.sender?.role === 'teacher' || msg.sender?.role === 'admin' ? 'text-indigo-600' : ''}>
+                                                                        {msg.sender?.role === 'teacher' || msg.sender?.role === 'admin' ? "Oʻqituvchi" : msg.sender?.name?.[0]}
                                                                     </span>
-                                                                </p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     ))
@@ -689,18 +713,18 @@ const LessonViewer = () => {
                                                 <div ref={discussionEndRef} />
                                             </div>
                                             
-                                            <div className="pt-4 border-t border-border mt-auto shrink-0 bg-card">
-                                                <div className="relative">
+                                            <div className="pt-4 border-t border-slate-100 mt-auto bg-white relative shrink-0">
+                                                <div className="relative group">
                                                     <input 
-                                                        className="w-full bg-secondary/50 rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
-                                                        placeholder="Xabar yozing..."
+                                                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-12 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                                                        placeholder="Xabar..."
                                                         value={discussionInput}
                                                         onChange={(e) => setDiscussionInput(e.target.value)}
                                                         onKeyDown={(e) => e.key === 'Enter' && handleSendDiscussion()}
                                                     />
                                                     <Button 
                                                         size="icon" 
-                                                        className="absolute right-1 top-1 w-9 h-9 rounded-xl bg-primary text-white" 
+                                                        className="absolute right-1 top-1 w-8 h-8 rounded-lg bg-[#7c3aed] text-white" 
                                                         onClick={handleSendDiscussion}
                                                     >
                                                         <Send className="w-4 h-4" />
@@ -709,35 +733,35 @@ const LessonViewer = () => {
                                             </div>
                                         </TabsContent>
                                     </div>
+                                    
+                                    {/* Cohesive Navigation Button Area */}
+                                    <div className="p-8 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                                        {hasQuiz && !hasPassedQuiz ? (
+                                            <Button 
+                                                className="w-full rounded-2xl h-16 bg-[#7c3aed] hover:bg-indigo-700 text-white font-black text-sm uppercase tracking-widest gap-3 shadow-xl shadow-indigo-500/20 transition-all duration-300 group"
+                                                onClick={() => navigate(`/lessons/${id}/quiz`)}
+                                                disabled={!videoCompleted && !isTeacher}
+                                            >
+                                                <BookOpen className="w-5 h-5" />
+                                                Testni boshlash
+                                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                            </Button>
+                                        ) : nextLesson ? (
+                                            <Button 
+                                                className="w-full rounded-2xl h-16 bg-slate-900 hover:bg-black text-white font-black text-sm uppercase tracking-widest gap-3 shadow-xl transition-all duration-300 group"
+                                                disabled={!videoCompleted && !isTeacher}
+                                                onClick={() => navigate(`/lessons/${nextLesson._id}`)}
+                                            >
+                                                Keyingi dars
+                                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                            </Button>
+                                        ) : (
+                                            <Button disabled className="w-full rounded-2xl h-16 bg-slate-100 text-slate-400 font-black text-sm uppercase tracking-widest border-none">
+                                                Kurs yakunlandi
+                                            </Button>
+                                        )}
+                                    </div>
                                 </Tabs>
-                            </div>
-
-                            {/* Navigation Buttons */}
-                            <div className="bg-card border border-border rounded-3xl p-6 shadow-sm shrink-0">
-                                <div className="flex flex-col xl:flex-row items-center justify-end gap-4 w-full">
-                                    {hasQuiz && !hasPassedQuiz ? (
-                                        <Button 
-                                            className="rounded-[1.25rem] gap-2 bg-gradient-to-r from-[#6eb0f2] to-[#6ed2c5] hover:from-[#5ca6ee] hover:to-[#5cc3b5] border-none text-white w-full xl:w-auto px-8 h-12 shadow-md transition-all font-medium text-base"
-                                            onClick={() => navigate(`/lessons/${id}/quiz`)}
-                                            disabled={!videoCompleted && !isTeacher}
-                                        >
-                                            <BookOpen className="w-4 h-4 mr-1" />
-                                            Testni boshlash
-                                            <ChevronRight className="w-4 h-4" />
-                                        </Button>
-                                    ) : nextLesson ? (
-                                        <Button 
-                                            className="rounded-[1.25rem] gap-2 bg-gradient-to-r from-[#6eb0f2] to-[#6ed2c5] hover:from-[#5ca6ee] hover:to-[#5cc3b5] border-none text-white w-full xl:w-auto px-8 h-12 shadow-md transition-all font-medium text-base"
-                                            disabled={!videoCompleted && !isTeacher}
-                                            onClick={() => navigate(`/lessons/${nextLesson._id}`)}
-                                        >
-                                            Keyingi dars
-                                            <ChevronRight className="w-4 h-4" />
-                                        </Button>
-                                    ) : (
-                                        <Button disabled className="rounded-[1.25rem] w-full xl:w-auto px-8 h-12 text-base font-medium">Kurs yakunlandi</Button>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -868,6 +892,96 @@ const LessonViewer = () => {
                     )}
                 </AnimatePresence>
 
+                {/* Discussion Modal */}
+                <AnimatePresence>
+                    {isChatExpanded && (
+                        <>
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsChatExpanded(false)}
+                                className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100]"
+                            />
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="fixed inset-x-4 top-[10%] bottom-[10%] md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-2xl bg-white rounded-[2.5rem] shadow-2xl z-[101] flex flex-col overflow-hidden border border-slate-100"
+                            >
+                                <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                                            <MessageCircle className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-black text-slate-900">Muhokama</h2>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dars yuzasidan fikrlar</p>
+                                        </div>
+                                    </div>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="w-10 h-10 rounded-xl hover:bg-rose-50 hover:text-rose-500 transition-colors"
+                                        onClick={() => setIsChatExpanded(false)}
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </Button>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-slate-50/30">
+                                    {discussionMessages.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-slate-300">
+                                            <MessageCircle className="w-16 h-16 mb-4 opacity-10" />
+                                            <p className="text-sm font-black uppercase tracking-widest">Xabarlar yoʻq</p>
+                                        </div>
+                                    ) : (
+                                        discussionMessages.map((msg) => (
+                                            <div key={msg._id} className={`flex gap-4 ${msg.sender?._id === user?._id ? 'flex-row-reverse' : ''}`}>
+                                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 font-black text-sm shrink-0 shadow-sm overflow-hidden">
+                                                    {msg.sender?.avatarUrl ? <img src={msg.sender.avatarUrl} alt="" className="w-full h-full object-cover" /> : msg.sender?.name?.[0]}
+                                                </div>
+                                                <div className={`space-y-2 max-w-[80%] ${msg.sender?._id === user?._id ? 'items-end' : ''}`}>
+                                                    <div className="flex items-center gap-2 px-1">
+                                                        <span className="text-[10px] font-black text-slate-900">{msg.sender?.name}</span>
+                                                        <span className="text-[9px] font-black text-slate-400 uppercase">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                    </div>
+                                                    <div className={`p-4 rounded-2xl text-sm font-medium shadow-sm transition-all ${
+                                                        msg.sender?._id === user?._id 
+                                                            ? 'bg-indigo-600 text-white rounded-tr-none' 
+                                                            : 'bg-white text-slate-700 rounded-tl-none'
+                                                    }`}>
+                                                        {msg.text}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                    <div ref={discussionEndRef} />
+                                </div>
+
+                                <div className="p-6 bg-white border-t border-slate-100">
+                                    <div className="relative group">
+                                        <input 
+                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-6 pr-14 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:bg-white focus:border-indigo-200 transition-all shadow-inner"
+                                            placeholder="Fikringizni yozing..."
+                                            value={discussionInput}
+                                            onChange={(e) => setDiscussionInput(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSendDiscussion()}
+                                        />
+                                        <Button 
+                                            size="icon" 
+                                            className="absolute right-2 top-2 w-10 h-10 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all" 
+                                            onClick={handleSendDiscussion}
+                                        >
+                                            <Send className="w-5 h-5" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
         </NavbarWithDrawer>
     );

@@ -150,7 +150,7 @@ const StudentDashboard = () => {
   return (
     <>
       <NavbarWithDrawer>
-      <div className="bg-[#fcfdff] min-h-screen pb-24 font-sans selection:bg-primary/20">
+      <div className="bg-[#fcfdff] min-h-screen pb-10 font-sans selection:bg-primary/20">
         {/* Premium Animated Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
@@ -212,19 +212,20 @@ const StudentDashboard = () => {
             </div>
           </motion.div>
 
-          {/* New Horizontal Stats Grid */}
+          {/* Premium Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { label: 'Tugallangan kurslar', value: studentProgress.filter(p => p.overallPercentage >= 100).length, icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-50' },
-              { label: 'Darslar ko\'rildi', value: totalLessonsViewed, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
-              { label: 'O\'rtacha ball', value: `${avgGrade}%`, icon: TrendingUp, color: 'text-violet-500', bg: 'bg-violet-50' },
+              { label: 'Tugallangan kurslar', value: studentProgress.filter(p => p.overallPercentage >= 100).length, icon: Trophy, color: 'from-amber-400 to-orange-600', shadow: 'shadow-orange-200/50', bg: 'bg-orange-50' },
+              { label: 'Darslar ko\'rildi', value: totalLessonsViewed, icon: BookOpen, color: 'from-blue-400 to-indigo-600', shadow: 'shadow-blue-200/50', bg: 'bg-blue-50' },
+              { label: 'O\'rtacha ball', value: `${avgGrade}%`, icon: TrendingUp, color: 'from-violet-400 to-purple-600', shadow: 'shadow-purple-200/50', bg: 'bg-purple-50' },
               { 
                 label: 'O\'quv vaqti', 
                 value: studentStats?.timeSpent > 3600 
                   ? `${Math.floor(studentStats.timeSpent / 3600)}s ${Math.floor((studentStats.timeSpent % 3600) / 60)}d`
                   : `${Math.floor((studentStats?.timeSpent || 0) / 60)} daqiqa`, 
                 icon: Zap, 
-                color: 'text-emerald-500',
+                color: 'from-emerald-400 to-teal-600',
+                shadow: 'shadow-emerald-200/50',
                 bg: 'bg-emerald-50'
               },
             ].map((stat, i) => (
@@ -233,14 +234,21 @@ const StudentDashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * i }}
-                className="bg-white border border-slate-100 rounded-[2.5rem] p-8 flex items-center gap-8 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all group"
+                whileHover={{ y: -5 }}
+                className="bg-white border border-slate-100 rounded-[2.5rem] p-8 flex flex-col items-start gap-6 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 group relative overflow-hidden"
               >
-                <div className={`w-16 h-16 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
-                  <stat.icon className="w-8 h-8" />
+                {/* Decorative background element */}
+                <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-[0.03] bg-gradient-to-br ${stat.color} group-hover:scale-150 transition-transform duration-700`} />
+                
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} text-white flex items-center justify-center shadow-lg ${stat.shadow} group-hover:rotate-6 transition-all duration-500`}>
+                  <stat.icon className="w-6 h-6" />
                 </div>
-                <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                  <p className="text-3xl font-black text-[#1e293b] tracking-tight">{stat.value}</p>
+                
+                <div className="space-y-1 relative z-10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</p>
+                  <p className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
+                    {stat.value}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -250,68 +258,76 @@ const StudentDashboard = () => {
             {/* Left Main Content */}
             <div className="lg:col-span-2 space-y-16">
               
-              {/* Continue Learning Section - Cinematic */}
+              {/* Continue Learning Section - Compact Premium */}
               <div className="space-y-6">
-                <div className="flex items-center gap-3 text-[#0f172a] font-black text-2xl px-2">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Play className="w-5 h-5 text-primary fill-primary" />
+                <div className="flex items-center justify-between px-2">
+                  <div className="flex items-center gap-3 text-slate-900 font-black text-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Play className="w-5 h-5 text-primary fill-primary" />
+                    </div>
+                    <span>Oʻqishni davom ettiring</span>
                   </div>
-                  <span>Oʻqishni davom ettiring</span>
                 </div>
                 
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="relative bg-[#1e293b] border border-slate-800 rounded-[3.5rem] p-10 lg:p-14 text-white overflow-hidden shadow-2xl shadow-slate-900/20 group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="relative bg-[#0f172a] rounded-[2.5rem] p-8 lg:p-10 text-white overflow-hidden shadow-2xl group border border-white/5"
                 >
-                  <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none bg-gradient-to-l from-primary/40 to-transparent" />
-                  <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-[80px]" />
- 
-                   <div className="relative z-10 space-y-10">
-                    <Badge className="bg-primary hover:bg-primary text-white border-none px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">
-                      FAOL DARSLIK
-                    </Badge>
-                    
-                    <div className="space-y-4">
-                      <h2 className="text-4xl lg:text-6xl font-black leading-[1.1] max-w-[90%] tracking-tight">
-                        {studentStats?.lastLesson?.title || "Hali dars boshlanmagan"}
-                      </h2>
-                      <div className="flex flex-wrap items-center gap-8 text-slate-400 text-lg font-bold">
-                        <div className="flex items-center gap-3">
-                          <Clock className="w-5 h-5 text-primary" />
-                          <span>12 minut qoldi</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <BookOpen className="w-5 h-5 text-primary" />
-                          <span>4-modul, 2-dars</span>
+                  {/* Decorative Elements */}
+                  <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
+                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-[50px]" />
+                  
+                  <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div className="space-y-6 flex-1">
+                      <Badge className="bg-primary/20 text-primary border-primary/30 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest backdrop-blur-md">
+                        Oxirgi koʻrilgan dars
+                      </Badge>
+                      
+                      <div className="space-y-2">
+                        <h2 className="text-2xl lg:text-3xl font-black tracking-tight leading-tight group-hover:text-primary transition-colors duration-500">
+                          {studentStats?.lastLesson?.title || "Hali dars boshlanmagan"}
+                        </h2>
+                        <div className="flex items-center gap-6 text-slate-400 font-bold text-sm">
+                           <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-primary" />
+                              <span>12 minut</span>
+                           </div>
+                           <div className="w-[1px] h-3 bg-white/10" />
+                           <div className="flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-primary" />
+                              <span>4-modul</span>
+                           </div>
                         </div>
                       </div>
                     </div>
- 
-                    <div className="space-y-6 max-w-xl">
-                      <div className="flex justify-between text-xs font-black uppercase tracking-widest text-slate-500">
-                        <span>JAMI PROGRESS</span>
-                        <span className="text-primary">{studentStats?.lastLesson ? 
-                          `${studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0}%` : 
-                          '0%'}</span>
+
+                    <div className="flex flex-col gap-6 md:w-72">
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          <span>Progress</span>
+                          <span className="text-primary">{studentStats?.lastLesson ? 
+                            `${studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0}%` : 
+                            '0%'}</span>
+                        </div>
+                        <div className="h-2.5 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/10">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${studentStats?.lastLesson ? 
+                              (studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0) : 0}%` }}
+                            className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full shadow-[0_0_10px_rgba(124,58,237,0.3)]" 
+                          />
+                        </div>
                       </div>
-                      <div className="h-3.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700 p-0.5">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${studentStats?.lastLesson ? 
-                            (studentProgress.find(p => p.courseId === studentStats.lastLesson.course)?.overallPercentage || 0) : 0}%` }}
-                          className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full shadow-[0_0_15px_rgba(124,58,237,0.5)]" 
-                        />
-                      </div>
+
+                      <Button 
+                        className="w-full bg-primary text-white hover:bg-white hover:text-primary rounded-2xl h-14 font-black text-sm gap-3 shadow-xl transition-all duration-500 transform group-hover:translate-x-2"
+                        onClick={handleContinue}
+                      >
+                        Davom ettirish
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
                     </div>
- 
-                    <Button 
-                      className="bg-primary text-white hover:bg-white hover:text-primary rounded-[1.5rem] px-12 h-16 font-black text-lg gap-3 shadow-2xl shadow-primary/20 transition-all duration-500 transform group-hover:scale-105"
-                      onClick={handleContinue}
-                    >
-                      Darsni davom ettirish
-                      <Play className="w-5 h-5 fill-current" />
-                    </Button>
                   </div>
                 </motion.div>
               </div>
@@ -488,7 +504,7 @@ const StudentDashboard = () => {
           </div>
         </main>
  
-        <div className="pt-24 pb-12 text-center">
+        <div className="pt-12 pb-8 text-center">
           <p className="text-[#94a3b8] text-[10px] font-black uppercase tracking-[0.4em] opacity-60">
             © 2026 MultiEdu Premium EdTech • Bilim platformasi
           </p>

@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config/apiConfig';
 import ReviewForm from '../../Components/ReviewForm';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Badge } from '@/Components/ui/badge';
 
 const HelpPage = () => {
   const { user } = useSelector((state) => state.auth);
@@ -128,23 +130,37 @@ const HelpPage = () => {
   };
 
   const renderStudentTeacherView = () => (
-    <Box>
-      <Box mb={8}>
-        <Typography variant="h3" sx={{ 
-          color: '#0f172a', 
-          fontWeight: '950', 
-          mb: 4, 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: 2,
-        }}>
-          <RecordVoiceOverIcon sx={{ fontSize: 40, color: '#2563eb' }} /> {t('instruction_title')}
-        </Typography>
-        <Typography variant="h6" sx={{ color: "#64748b", mb: 6, fontWeight: 'medium' }}>
-          {t('instruction_desc')}
-        </Typography>
+    <Box className="space-y-16">
+      {/* Header Section */}
+      <Box className="relative overflow-hidden rounded-[3rem] bg-white border border-slate-100 p-10 lg:p-14 shadow-sm">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+        <div className="relative z-10 space-y-6 max-w-3xl">
+          <Badge className="bg-primary/10 text-primary border-none px-5 py-1.5 rounded-full font-black text-[10px] tracking-widest uppercase">
+            Platforma koʻmagi
+          </Badge>
+          <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
+            Platformadan foydalanish <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">
+              yoʻriqnomasi
+            </span>
+          </h1>
+          <p className="text-lg text-slate-500 font-medium leading-relaxed">
+            Tizimdan qanday foydalanish, darslarni o'tish va vazifalarni ishlash bo'yicha <br className="hidden lg:block" />
+            qisqacha ma'lumotlar bilan tanishib chiqing.
+          </p>
+        </div>
+      </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '100%', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+      {/* FAQ Grid */}
+      <Box className="space-y-8">
+        <div className="flex items-center gap-4 px-2">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <RecordVoiceOverIcon className="w-7 h-7" />
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Ko'p so'raladigan savollar</h2>
+        </div>
+
+        <Grid container spacing={4}>
           {[
             { q: "Darslarga qanday qatnashaman?", a: "\"Mening Kurslarim\" bo'limiga o'tib, davom etayotgan kursingizni tanlang. U yerdagi mavzular ketma-ketligida dars materiallari (video, matn, fayl) bilan tanishib chiqishingiz mumkin." },
             { q: "Uy vazifalarini qanday yuklayman?", a: "Har bir dars oxirida uy vazifalari bo'lishi mumkin. Vazifani bajargach, \"Vazifani yuborish\" tugmasini bosing va fayl, rasm yoki havolani ilova qilib jo'nating." },
@@ -153,220 +169,236 @@ const HelpPage = () => {
             { q: "O'qituvchiga qanday qilib savol bersam bo'ladi?", a: "Har bir dars sahifasida sharhlar (kommentariyalar) yoki o'qituvchiga bevosita yozish funksiyasi mavjud. O'sha yerdan o'z savolingizni berishingiz mumkin." },
             { q: "Video darslar qotib qolyapti, qanday yo'l tutay?", a: "Bu asosan internet ulanishingizga bog'liq bo'lishi mumkin. Iltimos, ulanishni tekshiring yoki video sifati parametrini pastroq qilib ko'ring." }
           ].map((faq, index) => (
-            <Paper 
-              key={index}
-              className="glass-panel"
-              sx={{ 
-                p: 4, 
-                borderRadius: 1, 
-                border: '1px solid #e2e8f0',
-                bgcolor: '#ffffff',
-                transition: '0.3s',
-                '&:hover': { transform: 'translateY(-5px)', borderColor: '#2563eb' }
-              }}
-            >
-              <Typography variant="h6" sx={{ color: '#0f172a', fontWeight: '950', mb: 2 }}>{faq.q}</Typography>
-              <Typography variant="body2" sx={{ color: '#64748b', lineHeight: 1.7 }}>{faq.a}</Typography>
-            </Paper>
+            <Grid item xs={12} md={6} lg={4} key={index}>
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="bg-white border border-slate-100 rounded-[2.5rem] p-8 h-full shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors mb-6">
+                  <span className="font-black text-lg">0{index + 1}</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 mb-4 leading-snug group-hover:text-primary transition-colors">
+                  {faq.q}
+                </h3>
+                <p className="text-slate-500 font-medium leading-relaxed text-sm">
+                  {faq.a}
+                </p>
+              </motion.div>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Box>
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={5}>
-          <Card className="glass-panel" sx={{ borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff', height: '100%' }}>
-            <CardContent sx={{ p: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
-                <SupportAgentIcon sx={{ fontSize: 40, color: '#2563eb' }} />
-                <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: "950" }}>
-                  {t('support_title')}
-                </Typography>
-              </Box>
-              <Typography sx={{ color: "#64748b", mb: 4 }}>
-                {t('contact_desc')}
-              </Typography>
+      {/* Support Section */}
+      <Box className="grid lg:grid-cols-12 gap-10">
+        {/* Contact Form */}
+        <Box className="lg:col-span-5">
+          <div className="bg-white border border-slate-100 rounded-[3rem] p-10 shadow-sm space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <SupportAgentIcon className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Yordam xizmati</h3>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Adminga murojaat yuborish</p>
+              </div>
+            </div>
 
-              {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 1, bgcolor: '#fef2f2', color: '#ef4444' }}>{error}</Alert>}
-              {success && <Alert severity="success" sx={{ mb: 3, borderRadius: 1, bgcolor: '#f0fdf4', color: '#10b981' }}>{success}</Alert>}
+            <p className="text-slate-500 font-medium">
+              Agarda sizda savollar bo'lsa yoki texnik muammoga duch kelsangiz, quyidagi formani to'ldirib bizga yuboring.
+            </p>
 
-              <form onSubmit={handleCreateTicket}>
+            {error && <Alert severity="error" className="rounded-2xl border-none font-bold text-sm bg-rose-50 text-rose-600">{error}</Alert>}
+            {success && <Alert severity="success" className="rounded-2xl border-none font-bold text-sm bg-emerald-50 text-emerald-600">{success}</Alert>}
+
+            <form onSubmit={handleCreateTicket} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Murojaat mavzusi</label>
                 <TextField
                   fullWidth
-                  label={t('ticket_subject_label')}
+                  placeholder="Masalan: Kursga kirishda muammo"
                   variant="outlined"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   sx={{ 
-                    mb: 3,
                     '& .MuiOutlinedInput-root': {
-                      color: '#0f172a',
-                      '& fieldset': { borderColor: '#e2e8f0', borderRadius: 1 },
-                      '&:hover fieldset': { borderColor: '#cbd5e1' },
+                      bgcolor: '#f8fafc',
+                      '& fieldset': { borderColor: '#f1f5f9', borderRadius: '1.25rem' },
+                      '&:hover fieldset': { borderColor: '#e2e8f0' },
                       '&.Mui-focused fieldset': { borderColor: '#2563eb' },
-                    },
-                    '& .MuiInputLabel-root': { color: '#64748b' },
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#2563eb' },
+                    }
                   }}
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Batafsil ma'lumot</label>
                 <TextField
                   fullWidth
-                  label={t('ticket_msg_label')}
+                  placeholder="Xabaringizni yozing..."
                   variant="outlined"
                   multiline
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   sx={{ 
-                    mb: 4,
                     '& .MuiOutlinedInput-root': {
-                      color: '#0f172a',
-                      '& fieldset': { borderColor: '#e2e8f0', borderRadius: 1 },
-                      '&:hover fieldset': { borderColor: '#cbd5e1' },
+                      bgcolor: '#f8fafc',
+                      '& fieldset': { borderColor: '#f1f5f9', borderRadius: '1.25rem' },
+                      '&:hover fieldset': { borderColor: '#e2e8f0' },
                       '&.Mui-focused fieldset': { borderColor: '#2563eb' },
-                    },
-                    '& .MuiInputLabel-root': { color: '#64748b' },
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#2563eb' },
+                    }
                   }}
                   required
                 />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  startIcon={<SendIcon />}
-                  disabled={submitLoading || !message.trim()}
-                  sx={{ 
-                    borderRadius: 1, 
-                    textTransform: 'none', 
-                    py: 2,
-                    fontWeight: '950',
-                    background: '#2563eb',
-                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                    '&:hover': {
-                      background: '#1d4ed8',
-                      transform: 'translateY(-2px)',
-                    }
-                  }}
-                >
-                  {submitLoading ? t('saving') : t('send_ticket_btn')}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </Grid>
+              </div>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={submitLoading || !message.trim()}
+                className="h-16 rounded-[1.25rem] bg-primary hover:bg-primary/90 text-white font-black text-base gap-3 shadow-xl shadow-primary/20 transition-all duration-300"
+              >
+                {submitLoading ? t('saving') : "Xabarni yuborish"}
+                <SendIcon className="w-5 h-5" />
+              </Button>
+            </form>
+          </div>
+        </Box>
 
-        <Grid item xs={12} md={7}>
-          <Typography variant="h5" sx={{ color: '#0f172a', fontWeight: "950", mb: 4 }}>
-            {t('my_requests')}
-          </Typography>
-          <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0', mb: 4 }}>
-            <Tabs 
-              value={tabValue} 
-              onChange={handleTabChange} 
-              variant="fullWidth"
-              sx={{
-                '& .MuiTabs-indicator': { bgcolor: '#2563eb' },
-                '& .MuiTab-root': { color: '#64748b', fontWeight: '950' },
-                '& .Mui-selected': { color: '#2563eb !important' }
-              }}
-            >
-              <Tab label="Javob kutilayotganlar" />
-              <Tab label="Javob berilganlar" />
-            </Tabs>
-          </Box>
+        {/* Requests List */}
+        <Box className="lg:col-span-7 space-y-8">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-4 text-slate-900 font-black text-2xl">
+              <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                <AssignmentIcon className="w-5 h-5" />
+              </div>
+              <span>Mening murojaatlarim</span>
+            </div>
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl">
+              <button 
+                onClick={() => setTabValue(0)}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tabValue === 0 ? 'bg-white text-primary shadow-md' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                Javob kutilayotganlar
+              </button>
+              <button 
+                onClick={() => setTabValue(1)}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tabValue === 1 ? 'bg-white text-primary shadow-md' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                Javob berilganlar
+              </button>
+            </div>
+          </div>
+
           {loading ? (
-            <Box display="flex" justifyContent="center" p={8}><CircularProgress color="primary" /></Box>
+            <div className="flex justify-center py-20"><CircularProgress /></div>
           ) : tickets.filter(t => tabValue === 0 ? t.status !== 'closed' : t.status === 'closed').length === 0 ? (
-            <Paper className="glass-panel" sx={{ p: 10, textAlign: 'center', borderRadius: 1, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-              <AssignmentIcon sx={{ fontSize: 64, color: '#e2e8f0', mb: 2 }} />
-              <Typography sx={{ color: '#94a3b8', fontWeight: 'bold' }}>Bu bo'limda so'rovlar topilmadi</Typography>
-            </Paper>
+            <div className="bg-white border-2 border-dashed border-slate-100 rounded-[3rem] py-24 text-center space-y-4">
+              <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto text-slate-200">
+                <AssignmentIcon className="w-10 h-10" />
+              </div>
+              <p className="text-slate-400 font-black text-sm uppercase tracking-widest">Hozircha murojaatlar yo'q</p>
+            </div>
           ) : (
-            <Box sx={{ pr: 1, maxHeight: 600, overflowY: 'auto' }}>
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
               {tickets.filter(t => tabValue === 0 ? t.status !== 'closed' : t.status === 'closed').map(ticket => (
-                <Card 
+                <motion.div 
                   key={ticket._id} 
-                  className="glass-panel" 
+                  layout
                   onClick={() => setSelectedTicket(ticket)}
-                  sx={{ 
-                    mb: 2, 
-                    borderRadius: 1,
-                    border: '1px solid #e2e8f0',
-                    bgcolor: '#ffffff',
-                    cursor: 'pointer',
-                    transition: '0.3s',
-                    '&:hover': { bgcolor: '#f8fafc', borderColor: '#2563eb' }
-                  }}
+                  className="bg-white border border-slate-100 rounded-[2rem] p-6 cursor-pointer hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group"
                 >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                      <Typography sx={{ color: '#0f172a', fontWeight: "950" }}>
-                        {ticket.subject || t('no_subject')}
-                      </Typography>
-                      {renderStatus(ticket.status)}
-                    </Box>
-                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold' }}>
-                      {t('sent_label')}: {new Date(ticket.createdAt).toLocaleString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="font-black text-slate-900 text-lg group-hover:text-primary transition-colors">{ticket.subject || "Mavzusiz murojaat"}</h4>
+                    {renderStatus(ticket.status)}
+                  </div>
+                  <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <span>Yuborilgan: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                    <div className="w-1 h-1 rounded-full bg-slate-200" />
+                    <span className={ticket.replies?.length > 0 ? 'text-emerald-500' : 'text-slate-400'}>
+                      {ticket.replies?.length > 0 ? "Javob berilgan" : "Kutilmoqda"}
+                    </span>
+                  </div>
+                </motion.div>
               ))}
-            </Box>
+            </div>
           )}
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
+      {/* Modal Dialog */}
       <Dialog 
         open={Boolean(selectedTicket)} 
         onClose={() => setSelectedTicket(null)} 
         maxWidth="sm" 
         fullWidth
         PaperProps={{
-          className: 'glass-panel',
-          sx: { borderRadius: 1, border: '1px solid #e2e8f0', color: '#0f172a', bgcolor: '#ffffff' }
+          sx: { borderRadius: '2.5rem', overflow: 'hidden', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)' }
         }}
       >
         {selectedTicket && (
-          <React.Fragment>
-            <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 4 }}>
-              <Typography variant="h5" sx={{ fontWeight: '950' }}>
-                {selectedTicket.subject || 'Mavzusiz murojaat'}
-              </Typography>
-              <IconButton onClick={() => setSelectedTicket(null)} size="small" sx={{ color: '#64748b' }}>
+          <div className="flex flex-col h-full bg-white">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                  <AssignmentIcon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 leading-none mb-1">{selectedTicket.subject || 'Murojaat tafsiloti'}</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(selectedTicket.createdAt).toLocaleString()}</p>
+                </div>
+              </div>
+              <IconButton onClick={() => setSelectedTicket(null)} className="bg-white hover:bg-slate-100">
                 <CloseIcon />
               </IconButton>
-            </DialogTitle>
-            <DialogContent dividers sx={{ p: 4, borderColor: '#e2e8f0' }}>
-              <Box mb={4}>
-                <Typography variant="subtitle1" sx={{ color: '#2563eb', fontWeight: '950', mb: 2 }}>Sizning Murojaatingiz:</Typography>
-                <Paper elevation={0} sx={{ p: 3, bgcolor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
-                  <Typography variant="body1" sx={{ color: '#0f172a', whiteSpace: 'pre-wrap' }}>{selectedTicket.message}</Typography>
-                  <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontWeight: 'bold' }}>
-                    {new Date(selectedTicket.createdAt).toLocaleString()}
-                  </Typography>
-                </Paper>
-              </Box>
+            </div>
+
+            <div className="p-8 space-y-8 overflow-y-auto max-h-[500px] custom-scrollbar">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-6 bg-primary rounded-full" />
+                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sizning murojaatingiz</h5>
+                </div>
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <p className="text-slate-900 font-medium leading-relaxed whitespace-pre-wrap">{selectedTicket.message}</p>
+                </div>
+              </div>
               
               {selectedTicket.replies && selectedTicket.replies.length > 0 && (
-                <Box>
-                  <Divider sx={{ my: 4, borderColor: '#e2e8f0' }} />
-                  <Typography variant="subtitle1" sx={{ color: '#10b981', fontWeight: '950', mb: 2 }}>Admin Javoblari:</Typography>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-6 bg-emerald-500 rounded-full" />
+                    <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin javobi</h5>
+                  </div>
                   {selectedTicket.replies.map((reply, i) => (
-                    <Box key={i} sx={{ mt: 2, p: 3, bgcolor: '#f0fdf4', borderRadius: 1, border: '1px solid #dcfce7' }}>
-                      <Box display="flex" alignItems="center" gap={2} mb={2}>
-                        <Avatar sx={{ width: 32, height: 32, bgcolor: '#10b981', fontWeight: 'bold' }}>A</Avatar>
-                        <Typography variant="caption" sx={{ fontWeight: '950', color: '#10b981' }}>Bosh Admin</Typography>
-                      </Box>
-                      <Typography variant="body1" sx={{ color: '#0f172a', whiteSpace: 'pre-wrap' }}>{reply.message}</Typography>
-                      <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontWeight: 'bold' }}>
-                        {new Date(reply.createdAt).toLocaleString()}
-                      </Typography>
-                    </Box>
+                    <div key={i} className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 space-y-4 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                        <CheckCircleOutlineIcon className="w-16 h-16 text-emerald-600" />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Avatar sx={{ width: 32, height: 32, bgcolor: '#10b981', fontSize: '12px', fontWeight: 'bold' }}>A</Avatar>
+                        <div>
+                          <p className="text-xs font-black text-emerald-700 leading-none mb-1">MultiEdu Qo'llab-quvvatlash</p>
+                          <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{new Date(reply.createdAt).toLocaleTimeString()}</p>
+                        </div>
+                      </div>
+                      <p className="text-slate-900 font-medium leading-relaxed relative z-10">{reply.message}</p>
+                    </div>
                   ))}
-                </Box>
+                </div>
               )}
-            </DialogContent>
-          </React.Fragment>
+            </div>
+
+            <div className="p-8 bg-slate-50 border-t border-slate-100">
+               <Button 
+                fullWidth 
+                onClick={() => setSelectedTicket(null)}
+                className="h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-black text-sm hover:bg-slate-100 transition-colors"
+               >
+                 Yopish
+               </Button>
+            </div>
+          </div>
         )}
       </Dialog>
     </Box>
