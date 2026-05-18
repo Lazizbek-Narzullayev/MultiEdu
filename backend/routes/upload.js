@@ -38,7 +38,8 @@ router.post('/', auth, upload.single('file'), (req, res) => {
     }
 
     // Fayl yo'lini backend URL bilan qaytarish
-    const fileUrl = `http://localhost:5000/${req.file.path.replace(/\\/g, '/')}`;
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const fileUrl = `${protocol}://${req.get('host')}/${req.file.path.replace(/\\/g, '/')}`;
     res.json({ url: fileUrl });
 });
 
