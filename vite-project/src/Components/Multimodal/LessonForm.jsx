@@ -180,7 +180,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
             <div className="bg-card border border-border rounded-[2rem] shadow-2xl overflow-hidden">
                 <div className="p-6 md:p-8 border-b border-border bg-muted/20">
                     <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">
-                        {isEdit ? 'Darsni Tahrirlang' : 'Yangi Dars Yarating'}
+                        {isEdit ? 'Darsni tahrirlang' : 'Yangi dars yarating'}
                     </h1>
                     <p className="text-muted-foreground font-medium">
                         {isEdit ? 'Mavjud dars ma\'lumotlarini yangilash' : 'Interaktiv, multimodal va AI bilan boyitilgan ta\'lim tajribasi'}
@@ -199,7 +199,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                         <TabWrapper>
                             <div className="grid gap-8">
                                 <div className="space-y-4">
-                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Dars Sarlavhasi</label>
+                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Dars sarlavhasi</label>
                                     <input 
                                         name="title" value={formData.title} onChange={handleChange}
                                         className="w-full bg-muted/50 border border-border rounded-2xl p-4 text-xl font-bold focus:ring-2 focus:ring-primary outline-none transition-all"
@@ -207,7 +207,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                     />
                                 </div>
                                 <div className="space-y-4">
-                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Qisqacha Tavsif</label>
+                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Qisqacha tavsif</label>
                                     <textarea 
                                         name="description" value={formData.description} onChange={handleChange}
                                         className="w-full bg-muted/50 border border-border rounded-2xl p-4 min-h-[100px] focus:ring-2 focus:ring-primary outline-none transition-all"
@@ -216,7 +216,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                 </div>
                                 <div className="grid md:grid-cols-2 gap-8">
                                     <div className="space-y-4">
-                                        <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Muqova Rasmi</label>
+                                        <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Muqova rasmi</label>
                                         <div className="flex gap-2">
                                             <input 
                                                 name="thumbnailUrl" value={formData.thumbnailUrl} onChange={handleChange}
@@ -238,7 +238,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                     )}
                                 </div>
                                 <div className="space-y-4">
-                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Asosiy Matn (Ma'ruza)</label>
+                                    <label className="text-sm font-black uppercase tracking-widest text-muted-foreground">Asosiy matn (ma'ruza)</label>
                                     <textarea 
                                         name="textContent" value={formData.textContent} onChange={handleChange}
                                         className="w-full bg-muted/50 border border-border rounded-[2.5rem] p-8 min-h-[400px] focus:ring-2 focus:ring-primary outline-none transition-all leading-relaxed"
@@ -256,7 +256,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                 <div className="bg-muted/30 p-8 rounded-[2.5rem] border border-border space-y-6">
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center"><Video className="w-5 h-5" /></div>
-                                        <h3 className="text-xl font-black">Video Resurs</h3>
+                                        <h3 className="text-xl font-black">Video resurs</h3>
                                     </div>
                                     <div className="flex gap-2">
                                         <input 
@@ -272,7 +272,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                     {uploadProgress.video > 0 && <Progress value={uploadProgress.video} className="h-1" />}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Video Transkripti (AI uchun)</label>
+                                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Video transkripti (AI uchun)</label>
                                             <Button variant="ghost" size="sm" className="text-primary font-bold rounded-lg" onClick={handleTranslate}>
                                                 <Sparkles className="w-4 h-4 mr-2" /> AI Tarjima
                                             </Button>
@@ -290,7 +290,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                     <div className="bg-muted/30 p-8 rounded-[2.5rem] border border-border space-y-4">
                                         <div className="flex items-center gap-3 mb-2">
                                             <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><Music className="w-5 h-5" /></div>
-                                            <h3 className="text-lg font-black">Audio / Podkast</h3>
+                                            <h3 className="text-lg font-black">Audio / podkast</h3>
                                         </div>
                                         <div className="flex gap-2">
                                             <input 
@@ -338,7 +338,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center"><BoxIcon className="w-5 h-5" /></div>
-                                                <h3 className="text-xl font-black">Interaktiv 3D Model</h3>
+                                                <h3 className="text-xl font-black">Interaktiv 3D model</h3>
                                             </div>
                                             <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => setFormData({...formData, interactiveUrl: ''})}>
                                                 <Trash2 className="w-4 h-4 mr-2" /> O'chirish
@@ -375,7 +375,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-2xl font-black">Dars yakunidagi testlar</h2>
                                     <Button className="rounded-2xl bg-primary px-8 font-bold" onClick={() => setQuiz([...quiz, { question: '', options: ['', '', '', ''], correctAnswer: 0 }])}>
-                                        <Plus className="w-4 h-4 mr-2" /> Savol Qo'shish
+                                        <Plus className="w-4 h-4 mr-2" /> Savol qo'shish
                                     </Button>
                                 </div>
                                 
@@ -437,7 +437,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                         size="lg" className="rounded-[1.5rem] px-12 font-black text-lg bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20"
                         onClick={handleSubmit} disabled={loading}
                     >
-                        {loading ? 'Saqlanmoqda...' : <><Save className="w-5 h-5 mr-3" /> {isEdit ? 'Darsni Yangilash' : 'Darsni Saqlash'}</>}
+                        {loading ? 'Saqlanmoqda...' : <><Save className="w-5 h-5 mr-3" /> {isEdit ? 'Darsni yangilash' : 'Darsni saqlash'}</>}
                     </Button>
                 </div>
             </div>
