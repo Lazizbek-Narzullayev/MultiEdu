@@ -145,26 +145,7 @@ const LogIn = () => {
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="relative py-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#f1f5f9]" />
-            </div>
-            <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
-              <span className="px-4 bg-[#fcfdff] text-[#94a3b8]">{t('or', 'yoki')}</span>
-            </div>
-          </div>
-
           <div className="space-y-4">
-            <Button 
-                variant="outline" 
-                className="w-full h-14 gap-3 rounded-[1.25rem] border-[#e2e8f0] bg-white font-black text-[#64748b] hover:bg-slate-50 transition-all"
-                onClick={() => {}}
-            >
-                <Send className="w-5 h-5 text-[#0088cc] fill-[#0088cc]" />
-                {t('telegram_login', 'Telegram orqali kirish')}
-            </Button>
-
             <p className="text-center text-[#64748b] font-bold text-sm">
                 {t('no_account', 'Hali ro\'yxatdan o\'tmaganmisiz?')}{" "}
                 <Link to="/signup" className="text-primary hover:underline ml-1">

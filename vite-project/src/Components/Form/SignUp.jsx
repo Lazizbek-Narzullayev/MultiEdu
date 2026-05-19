@@ -234,17 +234,7 @@ const SignUp = () => {
             </Button>
           </form>
 
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#f1f5f9]" /></div>
-            <span className="relative px-4 bg-white text-[10px] font-black text-[#94a3b8] uppercase tracking-widest">Yoki</span>
-          </div>
-
-          <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-[#f1f5f9] hover:bg-[#f8fafc] font-black text-[#1e293b] gap-3">
-            <Send className="w-5 h-5 text-[#0088cc]" />
-            Telegram orqali kirish
-          </Button>
-
-          <p className="text-center text-[#64748b] font-bold">
+           <p className="text-center text-[#64748b] font-bold">
             Hisobingiz bormi?{" "}
             <Link to="/login" className="text-primary hover:underline">Kirish</Link>
           </p>
