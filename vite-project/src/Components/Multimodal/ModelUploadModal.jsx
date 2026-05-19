@@ -16,6 +16,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config/apiConfig';
 
 const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
     const [loading, setLoading] = useState(false);
@@ -79,13 +80,13 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
             const glbFormData = new FormData();
             glbFormData.append('file', file);
             glbFormData.append('type', '3d-models');
-            const glbRes = await axios.post('http://localhost:5000/api/upload', glbFormData, config);
+            const glbRes = await axios.post(`${API_BASE_URL}/upload`, glbFormData, config);
 
             // 2. Upload Thumbnail
             const thumbFormData = new FormData();
             thumbFormData.append('file', thumbFile);
             thumbFormData.append('type', '3d-thumbnails');
-            const thumbRes = await axios.post('http://localhost:5000/api/upload', thumbFormData, config);
+            const thumbRes = await axios.post(`${API_BASE_URL}/upload`, thumbFormData, config);
 
             // 3. Create Model Record
             const modelData = {
@@ -94,7 +95,7 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
                 thumbnail: thumbRes.data.url
             };
 
-            await axios.post('http://localhost:5000/api/models3d', modelData, {
+            await axios.post(`${API_BASE_URL}/models3d`, modelData, {
                 headers: { 'x-auth-token': token }
             });
 

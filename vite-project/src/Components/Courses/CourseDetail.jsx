@@ -491,7 +491,7 @@ const CourseDetail = () => {
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsLessonFormOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative z-10 p-10">
-                             <LessonForm courseId={id} onComplete={() => setIsLessonFormOpen(false)} />
+                             <LessonForm courseId={id} onComplete={() => { setIsLessonFormOpen(false); dispatch(getCourseById(id)); }} />
                         </motion.div>
                     </div>
                 )}
@@ -509,7 +509,7 @@ const CourseDetail = () => {
                                 <CourseForm 
                                     courseId={id} 
                                     initialData={currentCourse} 
-                                    onComplete={() => setIsEditOpen(false)} 
+                                    onComplete={() => { setIsEditOpen(false); dispatch(getCourseById(id)); }} 
                                 />
                             </div>
                         </motion.div>
@@ -528,7 +528,7 @@ const CourseDetail = () => {
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsQuizFormOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative z-10 p-10">
-                             <QuizForm courseId={id} onComplete={() => setIsQuizFormOpen(false)} />
+                             <QuizForm courseId={id} onComplete={() => { setIsQuizFormOpen(false); dispatch(getCourseQuizzes(id)); dispatch(getCourseById(id)); }} />
                         </motion.div>
                     </div>
                 )}
@@ -539,7 +539,7 @@ const CourseDetail = () => {
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsAssignmentFormOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative z-10 p-10">
-                             <AssignmentForm courseId={id} onComplete={() => setIsAssignmentFormOpen(false)} />
+                             <AssignmentForm courseId={id} onComplete={() => { setIsAssignmentFormOpen(false); dispatch(getCourseAssignments(id)); dispatch(getCourseById(id)); }} />
                         </motion.div>
                     </div>
                 )}

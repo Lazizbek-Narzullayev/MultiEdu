@@ -25,6 +25,7 @@ import ModelUploadModal from './ModelUploadModal';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { useEffect } from 'react';
+import { API_BASE_URL } from '../../config/apiConfig';
 
 // Verified 100% Stable 3D Models Library
 const PUBLIC_MODELS = [
@@ -125,7 +126,7 @@ const Library3D = ({ onSelectModel }) => {
     const fetchModels = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('http://localhost:5000/api/models3d');
+            const res = await axios.get(`${API_BASE_URL}/models3d`);
             setDynamicModels(res.data);
         } catch (err) {
             console.error('3D modellarni yuklashda xatolik:', err);
