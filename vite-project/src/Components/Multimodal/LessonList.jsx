@@ -134,13 +134,16 @@ const LessonList = () => {
         }, []) || [])
     ];
 
-    // Filter duplicates by _id
+    // Filter duplicates by title
     const allLessons = [];
-    const seenIds = new Set();
+    const seenTitles = new Set();
     for (const lesson of allLessonsRaw) {
-        if (lesson && lesson._id && !seenIds.has(lesson._id.toString())) {
-            seenIds.add(lesson._id.toString());
-            allLessons.push(lesson);
+        if (lesson && lesson.title) {
+            const normalizedTitle = lesson.title.toLowerCase().trim();
+            if (!seenTitles.has(normalizedTitle)) {
+                seenTitles.add(normalizedTitle);
+                allLessons.push(lesson);
+            }
         }
     }
 
