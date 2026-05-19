@@ -6,7 +6,7 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 // /start buyrug'ini ushlab olish
 bot.start(async (ctx) => {
     const startPayload = ctx.payload;
-    const ngrokUrl = 'https://wholesomely-predoubtful-nyla.ngrok-free.dev';
+    const ngrokUrl = process.env.FRONTEND_URL || 'https://wholesomely-predoubtful-nyla.ngrok-free.dev';
     const tgId = ctx.from.id.toString();
 
     try {
