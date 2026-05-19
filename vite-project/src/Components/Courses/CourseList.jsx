@@ -204,7 +204,7 @@ const CourseList = () => {
                                 transition={{ delay: 0.2 }}
                                 className="flex gap-4"
                             >
-                                {user?.role === 'super-admin' && (
+                                {(user?.role === 'super-admin' || user?.role === 'teacher') && (
                                     <Button 
                                         className="h-16 px-10 rounded-2xl bg-primary hover:bg-white hover:text-primary text-white font-black shadow-xl shadow-primary/20 gap-2 border-none transition-all duration-300 group"
                                         onClick={() => setIsCreateOpen(true)}
@@ -299,17 +299,17 @@ const CourseList = () => {
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
                             <div className="p-8 space-y-6">
                                 <div className="space-y-1">
-                                    <h2 className="text-2xl font-black text-[#1e293b]">Yangi kurs yaratish</h2>
-                                    <p className="text-slate-500 font-medium text-sm">Platformada yangi darslik kiriting.</p>
+                                    <h2 className="text-2xl font-black text-[#1e293b]">Yangi sinf yaratish</h2>
+                                    <p className="text-slate-500 font-medium text-sm">Platformada yangi sinfxona kiriting.</p>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Kurs nomi</label>
-                                        <input className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white px-5 outline-none transition-all font-bold text-slate-700" placeholder="Masalan: Web dasturlash" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} />
+                                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Sinf nomi</label>
+                                        <input className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white px-5 outline-none transition-all font-bold text-slate-700" placeholder="Masalan: 10-A sinf dasturlash" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-black uppercase text-slate-400 ml-1 tracking-widest">Tavsif</label>
-                                        <textarea className="w-full bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl p-5 min-h-[120px] focus:outline-none transition-all text-sm font-bold text-slate-700" placeholder="Kurs haqida batafsil..." value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
+                                        <textarea className="w-full bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl p-5 min-h-[120px] focus:outline-none transition-all text-sm font-bold text-slate-700" placeholder="Sinfxona haqida batafsil..." value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} />
                                     </div>
                                 </div>
                                 <div className="flex gap-3 pt-4">

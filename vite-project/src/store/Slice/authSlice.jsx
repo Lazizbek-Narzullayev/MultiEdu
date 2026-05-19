@@ -53,6 +53,7 @@ export const signup = createAsyncThunk(
         name: response.data.user.name,
         email: response.data.user.email,
         uid: response.data.user.id,
+        _id: response.data.user.id,
         role: response.data.user.role,
         token: response.data.token
       };
@@ -78,6 +79,7 @@ export const login = createAsyncThunk(
         name: response.data.user.name,
         email: response.data.user.email,
         uid: response.data.user.id,
+        _id: response.data.user.id,
         role: response.data.user.role,
         token: response.data.token
       };
@@ -100,6 +102,7 @@ export const telegramLogin = createAsyncThunk(
         name: response.data.user.name,
         email: response.data.user.email,
         uid: response.data.user.id,
+        _id: response.data.user.id,
         role: response.data.user.role,
         token: response.data.token
       };
@@ -147,6 +150,7 @@ export const updateProfile = createAsyncThunk(
         name: response.data.user.name,
         email: response.data.user.email,
         uid: response.data.user.id,
+        _id: response.data.user.id,
         role: response.data.user.role,
         token: token // preserve token
       };

@@ -84,7 +84,7 @@ const CourseDetail = () => {
 
     const isTeacher = ['teacher', 'admin', 'super-admin'].includes(user?.role?.toLowerCase());
     const courseTeacherId = currentCourse?.teacher?._id || currentCourse?.teacher;
-    const isOwner = courseTeacherId === user?._id;
+    const isOwner = (courseTeacherId && (courseTeacherId === user?._id || courseTeacherId === user?.uid)) || user?.role === 'super-admin';
 
     const handlePostAnnouncement = async () => {
         if (!announcementText.trim()) return;

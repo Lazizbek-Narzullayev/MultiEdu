@@ -66,10 +66,10 @@ const CourseForm = ({ courseId, initialData, onComplete, isEdit = true }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
                 <div>
-                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Kurs Sarlavhasi</label>
+                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Sinfxona sarlavhasi</label>
                     <input 
                         className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white px-4 outline-none transition-all font-bold text-slate-700 mt-1" 
-                        placeholder="Masalan: Full-Stack Web Development" 
+                        placeholder="Masalan: 10-A sinf dasturlash" 
                         value={formData.title} 
                         onChange={e => setFormData({...formData, title: e.target.value})} 
                         required
@@ -77,10 +77,10 @@ const CourseForm = ({ courseId, initialData, onComplete, isEdit = true }) => {
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Kurs Tavsifi</label>
+                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Sinfxona tavsifi</label>
                     <textarea 
                         className="w-full bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-2xl p-4 min-h-[150px] focus:outline-none transition-all text-sm font-bold text-slate-700 mt-1" 
-                        placeholder="Kurs haqida batafsil ma'lumot..." 
+                        placeholder="Sinfxona haqida batafsil ma'lumot..." 
                         value={formData.description} 
                         onChange={e => setFormData({...formData, description: e.target.value})} 
                         required
@@ -88,13 +88,13 @@ const CourseForm = ({ courseId, initialData, onComplete, isEdit = true }) => {
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Thumbnail (Rasm URL)</label>
+                    <label className="text-[10px] font-black uppercase text-[#94a3b8] ml-1 tracking-widest">Muqova rasmi (URL manzili)</label>
                     <div className="flex gap-3 mt-1">
                         <div className="relative flex-1">
                             <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#94a3b8]" />
                             <input 
                                 className="w-full h-14 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-primary focus:bg-white pl-12 pr-4 outline-none transition-all font-bold text-slate-700" 
-                                placeholder="https://example.com/image.jpg" 
+                                placeholder="https://picsum.photos/800/500" 
                                 value={formData.thumbnail} 
                                 onChange={e => setFormData({...formData, thumbnail: e.target.value})} 
                             />

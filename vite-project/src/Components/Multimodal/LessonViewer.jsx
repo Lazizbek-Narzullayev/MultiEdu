@@ -346,14 +346,26 @@ const LessonViewer = () => {
     };
 
     const handleStartVideo = () => {
+        setIsVideoStarted(true);
         if (playerRef.current) {
-            setIsVideoStarted(true);
-            playerRef.current.playVideo();
+            try {
+                playerRef.current.unMute();
+                playerRef.current.setVolume(100);
+                playerRef.current.seekTo(0);
+                playerRef.current.playVideo();
+            } catch (e) {
+                console.error("Autoplay un-mute error:", e);
+            }
         } else {
-            // If player not ready yet, wait a bit and try again
-            setIsVideoStarted(true);
             setTimeout(() => {
-                playerRef.current?.playVideo();
+                if (playerRef.current) {
+                    try {
+                        playerRef.current.unMute();
+                        playerRef.current.setVolume(100);
+                        playerRef.current.seekTo(0);
+                        playerRef.current.playVideo();
+                    } catch (e) {}
+                }
             }, 500);
         }
     };
@@ -387,9 +399,8 @@ const LessonViewer = () => {
                                                 disablekb: 1,
                                                 fs: 0,
                                                 iv_load_policy: 3,
-                                                autoplay: 0,
-                                                origin: window.location.origin,
-                                                widget_referrer: window.location.href
+                                                autoplay: 1,
+                                                mute: 1
                                             },
                                         }}
                                         onReady={onPlayerReady}
