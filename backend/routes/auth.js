@@ -310,6 +310,9 @@ router.get('/role/:role', auth, async (req, res) => {
 router.get('/telegram/status', auth, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('telegramId');
+        if (!user) {
+            return res.status(401).json({ msg: 'Foydalanuvchi topilmadi. Tizimdan chiqib, qayta kiring.' });
+        }
         res.json({ isLinked: !!user.telegramId, telegramId: user.telegramId });
     } catch (err) {
         console.error(err.message);

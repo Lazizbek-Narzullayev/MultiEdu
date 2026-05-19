@@ -113,7 +113,12 @@ const LessonList = () => {
     };
 
     const getThumbnail = (lesson) => {
-        if (lesson.thumbnailUrl && lesson.thumbnailUrl !== 'no-image') return lesson.thumbnailUrl;
+        if (lesson.thumbnailUrl && lesson.thumbnailUrl !== 'no-image') {
+            if (lesson.thumbnailUrl.startsWith('/uploads')) {
+                return `${API_BASE_URL}${lesson.thumbnailUrl}`;
+            }
+            return lesson.thumbnailUrl;
+        }
         if (lesson.videoUrl && lesson.videoUrl.includes('youtube.com')) {
             const videoId = lesson.videoUrl.split('v=')[1]?.split('&')[0];
             if (videoId) return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
@@ -121,13 +126,23 @@ const LessonList = () => {
         return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800';
     };
 
-    const allLessons = [
+    const allLessonsRaw = [
         ...(lessons || []),
         ...(officialCourses?.reduce((acc, course) => {
             const courseLessons = course.lessons || [];
             return [...acc, ...courseLessons];
         }, []) || [])
     ];
+
+    // Filter duplicates by _id
+    const allLessons = [];
+    const seenIds = new Set();
+    for (const lesson of allLessonsRaw) {
+        if (lesson && lesson._id && !seenIds.has(lesson._id.toString())) {
+            seenIds.add(lesson._id.toString());
+            allLessons.push(lesson);
+        }
+    }
 
     const filteredLessons = allLessons.filter(l => 
         l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
