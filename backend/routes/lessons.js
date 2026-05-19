@@ -74,7 +74,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // @route   PUT api/lessons/:id
-// @desc    Update a lesson
+// @desc    Update a lesson (Supports both regular and official lessons with auto-sync)
 // @access  Private (Owner / Admin / Super Admin)
 router.put('/:id', auth, async (req, res) => {
     const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz } = req.body;
@@ -86,10 +86,21 @@ router.put('/:id', auth, async (req, res) => {
 
     try {
         let lesson = await Lesson.findById(req.params.id);
+        let isOfficial = false;
+        
+        if (!lesson) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            lesson = await OfficialLesson.findById(req.params.id);
+            if (lesson) isOfficial = true;
+        }
+
         if (!lesson) return res.status(404).json({ msg: 'Dars topilmadi' });
 
         // Access check
-        if (lesson.instructor.toString() !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'super-admin') {
+        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' || 
+            (lesson.instructor && lesson.instructor.toString() === req.user.id);
+
+        if (!isAuthorized) {
             return res.status(401).json({ msg: 'Sizda bu darsni tahrirlash huquqi yo\'q' });
         }
 
@@ -98,11 +109,33 @@ router.put('/:id', auth, async (req, res) => {
             model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz
         };
 
-        lesson = await Lesson.findByIdAndUpdate(
-            req.params.id,
-            { $set: updateData },
-            { new: true }
-        );
+        if (isOfficial) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            lesson = await OfficialLesson.findByIdAndUpdate(
+                req.params.id,
+                { $set: updateData },
+                { new: true }
+            );
+            
+            // Sync changes to Lesson collection if it exists under the same title
+            await Lesson.findOneAndUpdate(
+                { title: lesson.title },
+                { $set: updateData }
+            );
+        } else {
+            lesson = await Lesson.findByIdAndUpdate(
+                req.params.id,
+                { $set: updateData },
+                { new: true }
+            );
+
+            // Sync changes to OfficialLesson collection if it exists under the same title
+            const OfficialLesson = require('../models/OfficialLesson');
+            await OfficialLesson.findOneAndUpdate(
+                { title: lesson.title },
+                { $set: updateData }
+            );
+        }
 
         res.json(lesson);
     } catch (err) {
@@ -138,22 +171,64 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // @route   DELETE api/lessons/:id
-// @desc    Delete a lesson
+// @desc    Delete a lesson (Supports both regular and official lessons with cascade clean ups)
 // @access  Private (Owner / Admin / Super Admin)
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const lesson = await Lesson.findById(req.params.id);
+        let lesson = await Lesson.findById(req.params.id);
+        let isOfficial = false;
+
+        if (!lesson) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            lesson = await OfficialLesson.findById(req.params.id);
+            if (lesson) isOfficial = true;
+        }
 
         if (!lesson) {
             return res.status(404).json({ msg: 'Dars topilmadi' });
         }
 
-        // Faqat o'sha o'qituvchi, admin yoki super-admin o'chira oladi
-        if (lesson.instructor.toString() !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'super-admin') {
+        // Access check
+        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' || 
+            (lesson.instructor && lesson.instructor.toString() === req.user.id);
+
+        if (!isAuthorized) {
             return res.status(401).json({ msg: 'Sizda bu darsni o\'chirish huquqi yo\'q' });
         }
 
-        await Lesson.findByIdAndDelete(req.params.id);
+        if (isOfficial) {
+            const OfficialLesson = require('../models/OfficialLesson');
+            const OfficialCourse = require('../models/OfficialCourse');
+            
+            // Delete from OfficialLesson
+            await OfficialLesson.findByIdAndDelete(req.params.id);
+            
+            // Clean up reference in OfficialCourse
+            await OfficialCourse.updateMany(
+                {},
+                { $pull: { lessons: req.params.id, "topics.$[].lessons": req.params.id } }
+            );
+
+            // Delete from Lesson collection under same title if exists
+            await Lesson.findOneAndDelete({ title: lesson.title });
+        } else {
+            // Delete from Lesson
+            await Lesson.findByIdAndDelete(req.params.id);
+
+            // Clean up OfficialLesson and OfficialCourse references under same title
+            const OfficialLesson = require('../models/OfficialLesson');
+            const OfficialCourse = require('../models/OfficialCourse');
+            
+            const offLesson = await OfficialLesson.findOne({ title: lesson.title });
+            if (offLesson) {
+                await OfficialLesson.findByIdAndDelete(offLesson._id);
+                await OfficialCourse.updateMany(
+                    {},
+                    { $pull: { lessons: offLesson._id, "topics.$[].lessons": offLesson._id } }
+                );
+            }
+        }
+
         res.json({ msg: 'Dars o\'chirildi' });
     } catch (err) {
         console.error(err.message);

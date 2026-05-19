@@ -27,25 +27,16 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { API_BASE_URL } from '../../config/apiConfig';
 
-// Verified 100% Stable 3D Models Library
+// Verified 100% Stable and Fast-Loading 3D Models Library
 const PUBLIC_MODELS = [
     {
-        id: 'tech-innovation',
-        title: 'Raqamli Innovatsiyalar (VR Tech)',
+        id: 'astronaut-space',
+        title: 'Astronavt Koinotda',
         category: 'texnika',
         type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=600&q=80',
-        description: 'Yuqori texnologiyali VR va aviatsiya innovatsiyalari modeli.'
-    },
-    {
-        id: 'cloud-infrastructure',
-        title: 'Bulutli Infrastruktura (Grid)',
-        category: 'tarmoq',
-        type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/EnvironmentTest/glTF-Binary/EnvironmentTest.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=600&q=80',
-        description: 'Raqamli tarmoq va bulutli hisoblash muhiti vizualizatsiyasi.'
+        url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80',
+        description: 'Eng mashhur koinot astronavtining to\'liq interaktiv 3D modeli.'
     },
     {
         id: 'blockchain-core',
@@ -54,52 +45,43 @@ const PUBLIC_MODELS = [
         type: 'glb',
         url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
         thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80',
-        description: 'Kriptografik xavfsizlik va blockchain bloklari himoyasi.'
+        description: 'Kriptografik xavfsizlik va blockchain bloklari himoyasi (Shlem).'
     },
     {
-        id: 'autonomous-mob',
-        title: 'Avtonom Mikromobilitet',
+        id: 'tech-innovation',
+        title: 'Raqamli Innovatsiyalar (Flight Helmet)',
         category: 'texnika',
         type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Buggy/glTF-Binary/Buggy.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1558603668-6570496b66f8?auto=format&fit=crop&w=600&q=80',
-        description: 'Sun\'iy intellekt boshqaruvidagi aqlli shahar transporti.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=600&q=80',
+        description: 'Aviatsiya va raqamli innovatsiyalar shlemining 3D vizualizatsiyasi.'
     },
     {
-        id: 'ridehailing-tech',
-        title: 'Ridehailing va Aqlli Logistika',
-        category: 'texnika',
-        type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CesiumMilkTruck/glTF-Binary/CesiumMilkTruck.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1519003300449-424ad040507b?auto=format&fit=crop&w=600&q=80',
-        description: 'Raqamli platformalar orqali boshqariladigan transport tizimi.'
-    },
-    {
-        id: 'ai-robotics',
-        title: 'Sun\'iy Intellekt va Robototexnika',
-        category: 'ai',
-        type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/RobotExpressive/glTF-Binary/RobotExpressive.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?auto=format&fit=crop&w=600&q=80',
-        description: 'Hissiyotlarni tushunuvchi va muloqot qiluvchi AI robot.'
-    },
-    {
-        id: 'iot-smart-system',
-        title: 'IoT va Aqlli Uy Tizimlari',
+        id: 'iot-smart-lantern',
+        title: 'IoT va Aqlli Yoritish Qurilmasi',
         category: 'ai',
         type: 'glb',
         url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
         thumbnail: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
-        description: 'Internet buyumlari orqali masofaviy boshqariladigan aqlli qurilmalar.'
+        description: 'Internet buyumlari orqali masofaviy boshqariladigan aqlli chiroq qurilmasi.'
     },
     {
         id: 'cyber-organic',
-        title: 'Kiber-Organik Jamiyat',
+        title: 'Kiber-Organik Tizimlar (Brain Stem)',
         category: 'ai',
         type: 'glb',
         url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/BrainStem/glTF-Binary/BrainStem.glb',
         thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=600&q=80',
-        description: 'Inson miyasi va raqamli texnologiyalar integratsiyasi.'
+        description: 'Inson miya nerv tizimlari va biologik kiber-organika modeli.'
+    },
+    {
+        id: 'premium-duck',
+        title: 'Innovatsion 3D Sariq O\'rdak',
+        category: 'texnika',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Duck/glTF-Binary/Duck.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1559811814-e2c57b5e69df?auto=format&fit=crop&w=600&q=80',
+        description: 'Eng mashhur va o\'ta yengil 3D o\'yinchoq o\'rdak modeli.'
     },
     {
         id: 'iss-360-tech',
