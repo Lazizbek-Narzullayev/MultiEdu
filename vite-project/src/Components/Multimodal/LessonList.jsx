@@ -44,6 +44,7 @@ const LessonList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { officialCourses, loading: coursesLoading, error } = useSelector((state) => state.courses);
+    const { lessons, loading: lessonsLoading } = useSelector((state) => state.lessons);
     const { user } = useSelector((state) => state.auth);
     const [completedLessonIds, setCompletedLessonIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -52,6 +53,7 @@ const LessonList = () => {
 
     useEffect(() => {
         dispatch(getOfficialCourses());
+        dispatch(fetchLessons());
         
         if (user && user.token) {
             axios.get(`${API_BASE_URL}/lessons/my-progress`, {
@@ -119,10 +121,13 @@ const LessonList = () => {
         return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800';
     };
 
-    const allLessons = officialCourses?.reduce((acc, course) => {
-        const courseLessons = course.lessons || [];
-        return [...acc, ...courseLessons];
-    }, []) || [];
+    const allLessons = [
+        ...(lessons || []),
+        ...(officialCourses?.reduce((acc, course) => {
+            const courseLessons = course.lessons || [];
+            return [...acc, ...courseLessons];
+        }, []) || [])
+    ];
 
     const filteredLessons = allLessons.filter(l => 
         l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
