@@ -258,7 +258,7 @@ const LessonList = () => {
                     {coursesLoading ? (
                         <Grid container spacing={4}>
                             {[1, 2, 3, 4, 5, 6].map((n) => (
-                                <Grid item xs={12} sm={6} md={4} key={n}>
+                                <Grid item xs={12} sm={4} md={4} key={n}>
                                     <Skeleton variant="rectangular" height={280} sx={{ borderRadius: '24px' }} />
                                     <Skeleton height={40} sx={{ mt: 2, borderRadius: 2 }} />
                                     <Skeleton width="60%" height={24} sx={{ borderRadius: 1 }} />
@@ -278,7 +278,7 @@ const LessonList = () => {
                                     }
 
                                     return (
-                                        <Grid item xs={12} sm={6} md={4} key={lesson._id}>
+                                        <Grid item xs={12} sm={4} md={4} key={lesson._id}>
                                             <motion.div
                                                 layout
                                                 initial={{ opacity: 0, y: 20 }}
