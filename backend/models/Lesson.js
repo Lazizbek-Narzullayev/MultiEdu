@@ -25,8 +25,12 @@ const LessonSchema = new mongoose.Schema({
         type: String, // 3D model (GLB/GLTF) havolasi
     },
     documentUrl: {
-        type: String, // PDF, Word, PPTX hujjatlar uchun havola
+        type: String, // PDF, Word, PPTX hujjatlar uchun havola (eski, backward compat)
     },
+    documents: [{
+        name: { type: String, default: 'Hujjat' },
+        url:  { type: String, required: true }
+    }],
     thumbnailUrl: {
         type: String, // Muqova rasmi
     },

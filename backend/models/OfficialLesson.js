@@ -27,6 +27,10 @@ const OfficialLessonSchema = new mongoose.Schema({
     documentUrl: {
         type: String,
     },
+    documents: [{
+        name: { type: String, default: 'Hujjat' },
+        url:  { type: String, required: true }
+    }],
     thumbnailUrl: {
         type: String,
     },

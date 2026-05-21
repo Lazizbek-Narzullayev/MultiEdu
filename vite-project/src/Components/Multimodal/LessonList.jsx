@@ -115,7 +115,7 @@ const LessonList = () => {
     const getThumbnail = (lesson) => {
         if (lesson.thumbnailUrl && lesson.thumbnailUrl !== 'no-image') {
             if (lesson.thumbnailUrl.startsWith('/uploads')) {
-                return `${API_BASE_URL}${lesson.thumbnailUrl}`;
+                return `${API_BASE_URL.replace('/api', '')}${lesson.thumbnailUrl}`;
             }
             return lesson.thumbnailUrl;
         }

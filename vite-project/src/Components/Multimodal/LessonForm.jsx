@@ -67,6 +67,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
     });
 
     const [quiz, setQuiz] = useState([]);
+    const [documents, setDocuments] = useState([]);
     const [uploadProgress, setUploadProgress] = useState({
         video: 0,
         audio: 0,
@@ -91,6 +92,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                     transcript: lesson.transcript || ''
                 });
                 setQuiz(lesson.quiz || []);
+                setDocuments(lesson.documents || []);
             });
         }
     }, [id, isEdit, dispatch, courseId]);
@@ -133,6 +135,35 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
         }
     };
 
+    const handleDocumentFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+        uploadFormData.append('type', 'document');
+        try {
+            setUploadProgress(prev => ({ ...prev, document: 10 }));
+            const res = await axios.post(`${API_BASE_URL}/upload`, uploadFormData, {
+                headers: { 'Content-Type': 'multipart/form-data', 'x-auth-token': user.token },
+                onUploadProgress: (progressEvent) => {
+                    const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(prev => ({ ...prev, document: progress }));
+                }
+            });
+            const fileName = file.name.replace(/\.[^/.]+$/, '');
+            setDocuments(prev => [...prev, { name: fileName, url: res.data.url }]);
+            Swal.fire({ icon: 'success', title: 'Yuklandi', timer: 1500, showConfirmButton: false });
+        } catch (error) {
+            Swal.fire('Xato', 'Fayl yuklashda xatolik', 'error');
+        } finally {
+            setUploadProgress(prev => ({ ...prev, document: 0 }));
+        }
+    };
+
+    const addManualDocument = () => {
+        setDocuments(prev => [...prev, { name: 'Yangi hujjat', url: '' }]);
+    };
+
     const handleTranslate = async () => {
         if (!formData.transcript.trim()) return;
         try {
@@ -153,7 +184,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
             return;
         }
 
-        const lessonData = { ...formData, quiz };
+        const lessonData = { ...formData, quiz, documents };
         let action;
         
         if (isEdit) {
@@ -308,22 +339,58 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
 
                                     {/* Document Section */}
                                     <div className="bg-muted/30 p-8 rounded-[2.5rem] border border-border space-y-4">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><FileText className="w-5 h-5" /></div>
-                                            <h3 className="text-lg font-black">Hujjat / PDF</h3>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center"><FileText className="w-5 h-5" /></div>
+                                                <div>
+                                                    <h3 className="text-lg font-black">Hujjatlar / PDF</h3>
+                                                    <p className="text-xs text-muted-foreground">{documents.length} ta hujjat</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button variant="outline" size="sm" className="rounded-xl border-2 relative font-bold text-emerald-600 border-emerald-200 hover:bg-emerald-50">
+                                                    <Upload className="w-4 h-4 mr-2" />Fayl yuklash
+                                                    <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleDocumentFileUpload} />
+                                                </Button>
+                                                <Button variant="outline" size="sm" className="rounded-xl border-2 font-bold" onClick={addManualDocument}>
+                                                    <Plus className="w-4 h-4 mr-2" />URL qo'shish
+                                                </Button>
+                                            </div>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <input 
-                                                name="documentUrl" value={formData.documentUrl} onChange={handleChange}
-                                                className="flex-1 bg-background border border-border rounded-2xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all"
-                                                placeholder="PDF URL"
-                                            />
-                                            <Button variant="outline" className="rounded-2xl h-auto border-2 relative">
-                                                <Upload className="w-4 h-4" />
-                                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, 'document')} />
-                                            </Button>
+                                        {uploadProgress.document > 0 && <Progress value={uploadProgress.document} className="h-1 mb-2" />}
+                                        <div className="space-y-3">
+                                            {documents.length === 0 && (
+                                                <div className="flex flex-col items-center py-8 text-muted-foreground border-2 border-dashed border-border rounded-2xl">
+                                                    <FileText className="w-10 h-10 mb-3 opacity-20" />
+                                                    <p className="text-sm font-bold">Hujjat qo'shilmagan</p>
+                                                    <p className="text-xs opacity-60 mt-1">Yuqoridagi tugmalardan foydalaning</p>
+                                                </div>
+                                            )}
+                                            <AnimatePresence>
+                                                {documents.map((doc, idx) => (
+                                                    <motion.div key={idx} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 20 }} className="flex items-center gap-3 p-4 bg-background border border-border rounded-2xl">
+                                                        <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                                                            <FileText className="w-4 h-4" />
+                                                        </div>
+                                                        <input
+                                                            className="w-28 shrink-0 bg-transparent text-sm font-bold outline-none border-b border-transparent hover:border-border focus:border-primary transition-colors"
+                                                            placeholder="Nomi..."
+                                                            value={doc.name}
+                                                            onChange={(e) => { const u = [...documents]; u[idx].name = e.target.value; setDocuments(u); }}
+                                                        />
+                                                        <input
+                                                            className="flex-1 bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-primary"
+                                                            placeholder="URL manzili..."
+                                                            value={doc.url}
+                                                            onChange={(e) => { const u = [...documents]; u[idx].url = e.target.value; setDocuments(u); }}
+                                                        />
+                                                        <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0" onClick={() => setDocuments(documents.filter((_, i) => i !== idx))}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
                                         </div>
-                                        {uploadProgress.document > 0 && <Progress value={uploadProgress.document} className="h-1" />}
                                     </div>
                                 </div>
                             </div>

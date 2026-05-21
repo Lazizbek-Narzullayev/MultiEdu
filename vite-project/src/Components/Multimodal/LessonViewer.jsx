@@ -18,6 +18,16 @@ import YouTube from 'react-youtube';
 import Swal from 'sweetalert2';
 import ModelViewer from './ModelViewer';
 
+const getFileUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+    const baseServerUrl = API_BASE_URL.replace('/api', '');
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${baseServerUrl}${cleanPath}`;
+};
+
 const LessonViewer = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -620,7 +630,7 @@ const LessonViewer = () => {
                                         <TabsContent value="3d" className="m-0 h-full flex flex-col p-6">
                                             {(lesson.model3dUrl || lesson.interactiveUrl) ? (
                                                 <div className="flex-1 w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-inner relative group">
-                                                    <ModelViewer model={{ url: lesson.model3dUrl || lesson.interactiveUrl }} />
+                                                    <ModelViewer model={{ url: getFileUrl(lesson.model3dUrl || lesson.interactiveUrl) }} />
                                                     <div className="absolute top-4 left-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none font-bold text-[10px] px-3 py-1 rounded-lg">
                                                             3D ENGINE v2.0
@@ -637,7 +647,26 @@ const LessonViewer = () => {
 
                                         <TabsContent value="fayllar" className="m-0 space-y-4 p-6 overflow-y-auto custom-scrollbar">
                                             <div className="space-y-3">
-                                                {lesson.documentUrl && (
+                                                {/* Multi-document support (new) */}
+                                                {lesson.documents && lesson.documents.length > 0 && lesson.documents.map((doc, idx) => (
+                                                    <div key={idx} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">
+                                                        <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
+                                                            <FileText className="w-5 h-5" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-black text-xs text-slate-900 truncate">{doc.name || 'Hujjat'}</p>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                                                                {doc.url?.split('.').pop()?.toUpperCase() || 'FAYL'}
+                                                            </p>
+                                                        </div>
+                                                        <Button size="sm" variant="ghost" className="h-8 rounded-lg font-black text-[9px] uppercase tracking-widest hover:text-rose-500" onClick={() => window.open(getFileUrl(doc.url))}>
+                                                            Yuklash
+                                                        </Button>
+                                                    </div>
+                                                ))}
+
+                                                {/* Backward compat: show old documentUrl if documents array is empty */}
+                                                {(!lesson.documents || lesson.documents.length === 0) && lesson.documentUrl && (
                                                     <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer">
                                                         <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
                                                             <FileText className="w-5 h-5" />
@@ -646,12 +675,13 @@ const LessonViewer = () => {
                                                             <p className="font-black text-xs text-slate-900 truncate">Dars taqdimoti</p>
                                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">PDF</p>
                                                         </div>
-                                                        <Button size="sm" variant="ghost" className="h-8 rounded-lg font-black text-[9px] uppercase tracking-widest hover:text-rose-500" onClick={() => window.open(lesson.documentUrl)}>
+                                                        <Button size="sm" variant="ghost" className="h-8 rounded-lg font-black text-[9px] uppercase tracking-widest hover:text-rose-500" onClick={() => window.open(getFileUrl(lesson.documentUrl))}>
                                                             Yuklash
                                                         </Button>
                                                     </div>
                                                 )}
 
+                                                {/* Audio */}
                                                 {lesson.audioUrl && (
                                                     <div className="flex flex-col gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                                         <div className="flex items-center gap-4">
@@ -663,11 +693,12 @@ const LessonViewer = () => {
                                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">MP3</p>
                                                             </div>
                                                         </div>
-                                                        <audio src={lesson.audioUrl} controls className="h-8 w-full scale-[0.9] origin-left" />
+                                                        <audio src={getFileUrl(lesson.audioUrl)} controls className="h-8 w-full scale-[0.9] origin-left" />
                                                     </div>
                                                 )}
 
-                                                {!lesson.documentUrl && !lesson.audioUrl && (
+                                                {/* Empty state */}
+                                                {(!lesson.documents || lesson.documents.length === 0) && !lesson.documentUrl && !lesson.audioUrl && (
                                                     <div className="flex flex-col items-center justify-center py-10 text-slate-300">
                                                         <FileText className="w-12 h-12 mb-3 opacity-10" />
                                                         <p className="font-black text-[10px] uppercase tracking-widest text-center">Fayllar yoʻq</p>
