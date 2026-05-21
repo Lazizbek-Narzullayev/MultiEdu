@@ -45,7 +45,7 @@ router.post('/', auth, async (req, res) => {
     }
 
     if (req.user.role === 'student') {
-        return res.status(403).json({ msg: 'Sizda dars qo'shish huquqi yo'q' });
+        return res.status(403).json({ msg: `Sizda dars qo'shish huquqi yo'q` });
     }
 
     try {
@@ -79,18 +79,16 @@ router.post('/', auth, async (req, res) => {
 // @desc    Update a lesson (Supports both regular and official lessons with auto-sync)
 // @access  Private (Owner / Admin / Super Admin)
 router.put('/:id', auth, async (req, res) => {
+    console.log('PUT /api/lessons/:id body:', req.body);
     const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz, documents } = req.body;
 
-    // Check mandatory fields (allow either documents array with at least one item or documentUrl)
-    const hasDocument = (documents && documents.length > 0) || documentUrl;
-    if (!title || !description || !textContent || !videoUrl || !audioUrl || !thumbnailUrl || !transcript || !hasDocument) {
-        return res.status(400).json({ msg: 'Iltimos, barcha majburiy maydonlarni to\'ldiring' });
-    }
+    // PUT route allows partial updates; no mandatory field validation required.
+    // (Document presence is optional during updates.)
 
     try {
         let lesson = await Lesson.findById(req.params.id);
         let isOfficial = false;
-        
+
         if (!lesson) {
             const OfficialLesson = require('../models/OfficialLesson');
             lesson = await OfficialLesson.findById(req.params.id);
@@ -100,17 +98,28 @@ router.put('/:id', auth, async (req, res) => {
         if (!lesson) return res.status(404).json({ msg: 'Dars topilmadi' });
 
         // Access check
-        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' || 
+        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' ||
             (lesson.instructor && lesson.instructor.toString() === req.user.id);
 
         if (!isAuthorized) {
             return res.status(401).json({ msg: 'Sizda bu darsni tahrirlash huquqi yo\'q' });
         }
 
-        const updateData = {
-            title, description, textContent, videoUrl, audioUrl, interactiveUrl, 
-            model3dUrl, documentUrl, documents: documents || [], thumbnailUrl, category, transcript, quiz
-        };
+        // Build updateData only with provided fields to avoid overwriting with undefined
+        const updateData = {};
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (textContent !== undefined) updateData.textContent = textContent;
+        if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
+        if (audioUrl !== undefined) updateData.audioUrl = audioUrl;
+        if (interactiveUrl !== undefined) updateData.interactiveUrl = interactiveUrl;
+        if (model3dUrl !== undefined) updateData.model3dUrl = model3dUrl;
+        if (documentUrl !== undefined) updateData.documentUrl = documentUrl;
+        if (thumbnailUrl !== undefined) updateData.thumbnailUrl = thumbnailUrl;
+        if (category !== undefined) updateData.category = category;
+        if (transcript !== undefined) updateData.transcript = transcript;
+        if (quiz !== undefined) updateData.quiz = quiz;
+        if (documents !== undefined) updateData.documents = documents;
 
         if (isOfficial) {
             const OfficialLesson = require('../models/OfficialLesson');
@@ -119,24 +128,11 @@ router.put('/:id', auth, async (req, res) => {
                 { $set: updateData },
                 { new: true }
             );
-            
-            // Sync changes to Lesson collection if it exists under the same title
-            await Lesson.findOneAndUpdate(
-                { title: lesson.title },
-                { $set: updateData }
-            );
         } else {
             lesson = await Lesson.findByIdAndUpdate(
                 req.params.id,
                 { $set: updateData },
                 { new: true }
-            );
-
-            // Sync changes to OfficialLesson collection if it exists under the same title
-            const OfficialLesson = require('../models/OfficialLesson');
-            await OfficialLesson.findOneAndUpdate(
-                { title: lesson.title },
-                { $set: updateData }
             );
         }
 
@@ -153,7 +149,7 @@ router.put('/:id', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
     try {
         let lesson = await Lesson.findById(req.params.id).populate('instructor', 'name email');
-        
+
         // Fallback to OfficialLesson
         if (!lesson) {
             const OfficialLesson = require('../models/OfficialLesson');
@@ -192,7 +188,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         // Access check
-        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' || 
+        const isAuthorized = req.user.role === 'admin' || req.user.role === 'super-admin' ||
             (lesson.instructor && lesson.instructor.toString() === req.user.id);
 
         if (!isAuthorized) {
@@ -202,10 +198,10 @@ router.delete('/:id', auth, async (req, res) => {
         if (isOfficial) {
             const OfficialLesson = require('../models/OfficialLesson');
             const OfficialCourse = require('../models/OfficialCourse');
-            
+
             // Delete from OfficialLesson
             await OfficialLesson.findByIdAndDelete(req.params.id);
-            
+
             // Clean up reference in OfficialCourse
             await OfficialCourse.updateMany(
                 {},
@@ -221,7 +217,7 @@ router.delete('/:id', auth, async (req, res) => {
             // Clean up OfficialLesson and OfficialCourse references under same title
             const OfficialLesson = require('../models/OfficialLesson');
             const OfficialCourse = require('../models/OfficialCourse');
-            
+
             const offLesson = await OfficialLesson.findOne({ title: lesson.title });
             if (offLesson) {
                 await OfficialLesson.findByIdAndDelete(offLesson._id);
