@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { getOfficialStats, getTeacherClassesStats } from '../../store/Slice/courseSlice';
 import { 
   Users, 
@@ -25,7 +26,9 @@ import {
   MoreVertical,
   LayoutGrid,
   ListFilter,
-  GraduationCap
+  GraduationCap,
+  Download,
+  ChevronDown
 } from 'lucide-react';
 
 import { API_BASE_URL } from '../../config/apiConfig';
@@ -35,6 +38,20 @@ import { Badge } from '@/Components/ui/badge';
 import { Progress } from '@/Components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+
+const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = (err) => reject(err);
+        document.head.appendChild(script);
+    });
+};
 
 const SuperAdminDashboard = () => {
     const dispatch = useDispatch();
@@ -50,6 +67,154 @@ const SuperAdminDashboard = () => {
     const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
     const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+
+    const handleExport = async (format) => {
+        if (!stats?.teacherStats || stats.teacherStats.length === 0) {
+            Swal.fire({
+                title: "Xatolik!",
+                text: "Eksport qilish uchun ma'lumotlar mavjud emas.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: "Yuklanmoqda...",
+            text: "Hujjat tayyorlanmoqda, iltimos kuting.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            if (format === 'excel') {
+                await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+                const XLSX = window.XLSX;
+                
+                const worksheetData = [
+                    ["O'qituvchi", "Email", "Kurslar soni", "O'quvchilar soni", "O'rtacha o'zlashtirish (%)"]
+                ];
+                
+                stats.teacherStats.forEach(t => {
+                    worksheetData.push([t.name, t.email, t.courseCount, t.totalStudents, t.averageMastery]);
+                });
+                
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "O'qituvchilar reytingi");
+                
+                XLSX.writeFile(workbook, "oqituvchilar_reytingi.xlsx");
+                
+            } else if (format === 'pdf') {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js');
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(18);
+                doc.text("O'qituvchilar Reytingi", 14, 20);
+                doc.setFontSize(10);
+                doc.text(`Sana: ${new Date().toLocaleDateString()}`, 14, 28);
+                
+                const tableColumn = ["O'qituvchi", "Email", "Kurslar", "O'quvchilar", "O'zlashtirish"];
+                const tableRows = [];
+                
+                stats.teacherStats.forEach(t => {
+                    tableRows.push([t.name, t.email, t.courseCount, t.totalStudents, `${t.averageMastery}%`]);
+                });
+                
+                doc.autoTable({
+                    startY: 32,
+                    head: [tableColumn],
+                    body: tableRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: [79, 70, 229] },
+                    styles: { font: 'helvetica', fontSize: 10 },
+                });
+                
+                doc.save("oqituvchilar_reytingi.pdf");
+                
+            } else if (format === 'word') {
+                const content = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head>
+                        <title>O'qituvchilar reytingi</title>
+                        <!--[if gte mso 9]>
+                        <xml>
+                            <w:WordDocument>
+                                <w:View>Print</w:View>
+                                <w:Zoom>90</w:Zoom>
+                            </w:WordDocument>
+                        </xml>
+                        <![endif]-->
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; }
+                            h2 { color: #4f46e5; font-size: 20px; margin-bottom: 20px; }
+                            table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+                            th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 12px; }
+                            th { background-color: #4f46e5; color: white; font-weight: bold; }
+                            tr:nth-child(even) { background-color: #f8fafc; }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>O'qituvchilar reytingi</h2>
+                        <p>Sana: ${new Date().toLocaleDateString()}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>O'qituvchi</th>
+                                    <th>Email</th>
+                                    <th>Kurslar</th>
+                                    <th>O'quvchilar</th>
+                                    <th>O'zlashtirish</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${stats.teacherStats.map(t => `
+                                    <tr>
+                                        <td>${t.name}</td>
+                                        <td>${t.email}</td>
+                                        <td>${t.courseCount}</td>
+                                        <td>${t.totalStudents}</td>
+                                        <td>${t.averageMastery}%</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                    </html>
+                `;
+                const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "oqituvchilar_reytingi.doc";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            
+            Swal.fire({
+                title: "Muvaffaqiyatli!",
+                text: "Hujjat muvaffaqiyatli yuklab olindi.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error("Export error:", error);
+            Swal.fire({
+                title: "Xatolik!",
+                text: "Hujjat yuklashda xatolik yuz berdi.",
+                icon: "error",
+                confirmButtonText: "Ok"
+            });
+        }
+    };
 
     useEffect(() => {
         console.log('Dashboard mounted, fetching stats...');
@@ -359,7 +524,66 @@ const SuperAdminDashboard = () => {
                                         <Users className="w-5 h-5 text-primary" />
                                         O'qituvchilar reytingi
                                     </h2>
-                                    <Button variant="outline" className="rounded-xl font-bold">Eksport</Button>
+                                    <div className="relative">
+                                        <Button 
+                                            variant="outline" 
+                                            className="rounded-xl font-bold flex items-center gap-2 border-primary/20 hover:bg-primary/5 active:scale-95 transition-all"
+                                            onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+                                        >
+                                            <Download className="w-4 h-4 text-primary" />
+                                            Eksport
+                                            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exportDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </Button>
+                                        
+                                        <AnimatePresence>
+                                            {exportDropdownOpen && (
+                                                <>
+                                                    <div 
+                                                        className="fixed inset-0 z-10" 
+                                                        onClick={() => setExportDropdownOpen(false)}
+                                                    />
+                                                    <motion.div 
+                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                        transition={{ duration: 0.15 }}
+                                                        className="absolute right-0 mt-2 w-48 bg-white border border-border rounded-2xl shadow-xl py-2 z-20 overflow-hidden"
+                                                    >
+                                                        <button
+                                                            onClick={() => {
+                                                                handleExport('pdf');
+                                                                setExportDropdownOpen(false);
+                                                            }}
+                                                            className="w-full px-4 py-3 text-left text-sm font-bold text-foreground hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2.5 transition-colors cursor-pointer"
+                                                        >
+                                                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                                            PDF Hujjat (.pdf)
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                handleExport('excel');
+                                                                setExportDropdownOpen(false);
+                                                            }}
+                                                            className="w-full px-4 py-3 text-left text-sm font-bold text-foreground hover:bg-emerald-50 hover:text-emerald-600 flex items-center gap-2.5 transition-colors cursor-pointer"
+                                                        >
+                                                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                            Excel Jadval (.xlsx)
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                handleExport('word');
+                                                                setExportDropdownOpen(false);
+                                                            }}
+                                                            className="w-full px-4 py-3 text-left text-sm font-bold text-foreground hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors cursor-pointer"
+                                                        >
+                                                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                            Word Hujjat (.doc)
+                                                        </button>
+                                                    </motion.div>
+                                                </>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
