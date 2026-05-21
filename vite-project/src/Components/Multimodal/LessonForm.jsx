@@ -140,32 +140,40 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
     };
 
     const handleDocumentFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', file);
-        uploadFormData.append('type', 'document');
-        try {
-            setUploadProgress(prev => ({ ...prev, document: 10 }));
-            const res = await axios.post(`${API_BASE_URL}/upload`, uploadFormData, {
-                headers: { 'Content-Type': 'multipart/form-data', 'x-auth-token': user.token },
-                onUploadProgress: (progressEvent) => {
-                    const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    setUploadProgress(prev => ({ ...prev, document: progress }));
-                }
-            });
-            const fileName = file.name.replace(/\.[^/.]+$/, '');
-            setDocuments(prev => [...prev, { name: fileName, url: res.data.url }]);
-            Swal.fire({ icon: 'success', title: 'Yuklandi', timer: 1500, showConfirmButton: false });
-        } catch (error) {
-            Swal.fire('Xato', 'Fayl yuklashda xatolik', 'error');
-        } finally {
-            setUploadProgress(prev => ({ ...prev, document: 0 }));
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        const uploadedDocs = [];
+        for (const file of files) {
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', file);
+            uploadFormData.append('type', 'document');
+            try {
+                setUploadProgress(prev => ({ ...prev, document: 10 }));
+                const res = await axios.post(`${API_BASE_URL}/upload`, uploadFormData, {
+                    headers: { 'Content-Type': 'multipart/form-data', 'x-auth-token': user.token },
+                    onUploadProgress: (progressEvent) => {
+                        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        setUploadProgress(prev => ({ ...prev, document: progress }));
+                    }
+                });
+                const fileName = file.name.replace(/\.[^/.]+$/, '');
+                uploadedDocs.push({ name: fileName, url: res.data.url });
+                Swal.fire({ icon: 'success', title: 'Yuklandi', timer: 1500, showConfirmButton: false });
+            } catch (error) {
+                Swal.fire('Xato', 'Fayl yuklashda xatolik', 'error');
+            } finally {
+                setUploadProgress(prev => ({ ...prev, document: 0 }));
+            }
         }
+        // Merge newly uploaded docs with existing ones
+        setDocuments(prev => [...prev, ...uploadedDocs]);
+        setFormData(prev => ({ ...prev, documentUrl: '' }));
     };
 
     const addManualDocument = () => {
         setDocuments(prev => [...prev, { name: 'Yangi hujjat', url: '' }]);
+        // Clear legacy single document URL to avoid conflict
+        setFormData(prev => ({ ...prev, documentUrl: '' }));
     };
 
     const handleTranslate = async () => {
@@ -189,10 +197,16 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
         }
 
         const lessonData = { ...formData, quiz, documents };
+        // If we have documents, clear legacy documentUrl to avoid confusion
+        if (documents && documents.length > 0) {
+            lessonData.documentUrl = '';
+        }
         let action;
         
         if (isEdit) {
             action = await dispatch(updateLesson({ id, lessonData }));
+            // Refresh the lesson to ensure UI shows latest data
+            await dispatch(fetchLessonById(id));
         } else {
             action = await dispatch(addLesson(lessonData));
         }
@@ -357,7 +371,7 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                                 <Button variant="outline" size="sm" className="rounded-xl border-2" onClick={() => fileInputRef.current?.click()}>
                                                     <Upload className="w-4 h-4 mr-2" />Fayl yuklash
                                                 </Button>
-                                                <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" ref={fileInputRef} className="hidden" onChange={handleDocumentFileUpload} />
+                                                <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" ref={fileInputRef} multiple className="hidden" onChange={handleDocumentFileUpload} />
                                             </div>
                                         </div>
                                         {uploadProgress.document > 0 && <Progress value={uploadProgress.document} className="h-1 mb-2" />}

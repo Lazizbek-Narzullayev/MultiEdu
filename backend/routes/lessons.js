@@ -36,15 +36,16 @@ router.get('/', auth, async (req, res) => {
 // @desc    Add a new lesson
 // @access  Private (Teacher / Super Admin)
 router.post('/', auth, async (req, res) => {
-    const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, courseId, transcript, quiz } = req.body;
+    const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, courseId, transcript, quiz, documents } = req.body;
 
-    // Check mandatory fields for multimodality
-    if (!title || !description || !textContent || !videoUrl || !audioUrl || !documentUrl || !thumbnailUrl || !transcript) {
-        return res.status(400).json({ msg: 'Iltimos, barcha majburiy maydonlarni to\'ldiring (Video, Audio, Matn, Hujjat, Muqova va Transkript majburiy)' });
+    // Check mandatory fields (allow either documents array with at least one item or documentUrl)
+    const hasDocument = (documents && documents.length > 0) || documentUrl;
+    if (!title || !description || !textContent || !videoUrl || !audioUrl || !thumbnailUrl || !transcript || !hasDocument) {
+        return res.status(400).json({ msg: "Iltimos, barcha majburiy maydonlarni to'ldiring (Video, Audio, Matn, Hujjat/URL, Muqova va Transkript majburiy)" });
     }
 
     if (req.user.role === 'student') {
-        return res.status(403).json({ msg: 'Sizda dars qo\'shish huquqi yo\'q' });
+        return res.status(403).json({ msg: 'Sizda dars qo'shish huquqi yo'q' });
     }
 
     try {
@@ -57,6 +58,7 @@ router.post('/', auth, async (req, res) => {
             interactiveUrl,
             model3dUrl,
             documentUrl,
+            documents: documents || [],
             thumbnailUrl,
             category,
             transcript,
@@ -77,10 +79,11 @@ router.post('/', auth, async (req, res) => {
 // @desc    Update a lesson (Supports both regular and official lessons with auto-sync)
 // @access  Private (Owner / Admin / Super Admin)
 router.put('/:id', auth, async (req, res) => {
-    const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz } = req.body;
+    const { title, description, textContent, videoUrl, audioUrl, interactiveUrl, model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz, documents } = req.body;
 
-    // Check mandatory fields for multimodality
-    if (!title || !description || !textContent || !videoUrl || !audioUrl || !documentUrl || !thumbnailUrl || !transcript) {
+    // Check mandatory fields (allow either documents array with at least one item or documentUrl)
+    const hasDocument = (documents && documents.length > 0) || documentUrl;
+    if (!title || !description || !textContent || !videoUrl || !audioUrl || !thumbnailUrl || !transcript || !hasDocument) {
         return res.status(400).json({ msg: 'Iltimos, barcha majburiy maydonlarni to\'ldiring' });
     }
 
@@ -106,7 +109,7 @@ router.put('/:id', auth, async (req, res) => {
 
         const updateData = {
             title, description, textContent, videoUrl, audioUrl, interactiveUrl, 
-            model3dUrl, documentUrl, thumbnailUrl, category, transcript, quiz
+            model3dUrl, documentUrl, documents: documents || [], thumbnailUrl, category, transcript, quiz
         };
 
         if (isOfficial) {
