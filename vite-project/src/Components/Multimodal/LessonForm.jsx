@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,7 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Progress } from '@/Components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/Components/ui/dialog';
 
 const TabWrapper = ({ children }) => (
     <motion.div 
@@ -68,6 +69,9 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
 
     const [quiz, setQuiz] = useState([]);
     const [documents, setDocuments] = useState([]);
+    const [showUrlModal, setShowUrlModal] = useState(false);
+    const [manualUrl, setManualUrl] = useState('');
+    const fileInputRef = useRef(null);
     const [uploadProgress, setUploadProgress] = useState({
         video: 0,
         audio: 0,
