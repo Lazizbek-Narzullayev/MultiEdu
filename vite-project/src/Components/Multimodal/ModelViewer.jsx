@@ -154,7 +154,7 @@ const ModelViewer = ({ model }) => {
                                 iv_load_policy: 3,
                             },
                         }}
-                        className="w-[108%] h-[108%] absolute -top-[4%] -left-[4%] pointer-events-none"
+                        className="w-full h-full absolute top-0 left-0"
                     />
                 ) : (
                     <iframe 

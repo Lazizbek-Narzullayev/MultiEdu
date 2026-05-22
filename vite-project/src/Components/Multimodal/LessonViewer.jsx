@@ -394,9 +394,6 @@ const LessonViewer = () => {
                             <div id="video-container" className="relative bg-black rounded-3xl overflow-hidden aspect-video shadow-2xl border border-border group">
                                 {/* Video Player Wrapper with Cinema Masks */}
                                 <div className={`w-full h-full relative overflow-hidden transition-all duration-700 ${isVideoStarted ? 'opacity-100' : 'opacity-0'}`}>
-                                    {/* Top Mask (Hides Title) */}
-                                    <div className="absolute top-0 left-0 right-0 h-[8%] bg-black z-[10] pointer-events-none" />
-                                    
                                     <YouTube
                                         videoId={videoId}
                                         opts={{
@@ -405,9 +402,7 @@ const LessonViewer = () => {
                                             playerVars: { 
                                                 rel: 0, 
                                                 modestbranding: 1,
-                                                controls: 0, 
-                                                disablekb: 1,
-                                                fs: 0,
+                                                controls: 1, 
                                                 iv_load_policy: 3,
                                                 autoplay: 1,
                                                 mute: 1
@@ -415,11 +410,8 @@ const LessonViewer = () => {
                                         }}
                                         onReady={onPlayerReady}
                                         onStateChange={onPlayerStateChange}
-                                        className="w-[110%] h-[110%] absolute -top-[5%] -left-[5%] pointer-events-none select-none z-[1]"
+                                        className="w-full h-full absolute top-0 left-0 pointer-events-none select-none z-[1]"
                                     />
-
-                                    {/* Bottom Mask (Hides Logo/Progress) */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-[8%] bg-black z-[10] pointer-events-none" />
                                 </div>
 
                                 {/* Custom Poster Overlay (Initial Start) */}
