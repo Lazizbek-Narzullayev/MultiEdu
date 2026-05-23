@@ -24,7 +24,22 @@ class ModelErrorBoundary extends React.Component {
         if (this.props.onError) this.props.onError();
     }
     render() {
-        if (this.state.hasError) return null;
+        if (this.state.hasError) {
+            return (
+                <Box sx={{ width: '100%', height: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', bgcolor: '#f8fafc', color: '#64748b', p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid #e2e8f0' }}>
+                    <ErrorOutlineIcon sx={{ fontSize: 48, mb: 2, color: '#f43f5e' }} />
+                    <Typography variant="h6" sx={{ color: '#0f172a', mb: 1, fontWeight: 700 }}>
+                        3D Modelni ochib bo'lmadi
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 3 }}>
+                        Fayl manzili noto'g'ri (404) yoki internet aloqasida muammo bor.
+                    </Typography>
+                    <Button variant="contained" onClick={() => this.setState({ hasError: false })} startIcon={<RefreshIcon />} sx={{ bgcolor: '#00A5C4', '&:hover': { bgcolor: '#008ba5' }, textTransform: 'none', borderRadius: 2 }}>
+                        Qayta urinish
+                    </Button>
+                </Box>
+            );
+        }
         return this.props.children;
     }
 }
@@ -216,6 +231,7 @@ const ModelViewer = ({ model }) => {
 };
 
 // Preload models for faster user experience in the library
-useGLTF.preload('https://modelviewer.dev/shared-assets/models/Astronaut.glb');
+useGLTF.preload('https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb');
+
 
 export default ModelViewer;
