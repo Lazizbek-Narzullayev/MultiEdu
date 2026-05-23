@@ -71,7 +71,7 @@ const LessonViewer = () => {
     const discussionEndRef = useRef(null);
 
     // Layout State
-    const [activeTab, setActiveTab] = useState('3d');
+    const [activeTab, setActiveTab] = useState('fayllar');
     const [nextLesson, setNextLesson] = useState(null);
     const [isChatExpanded, setIsChatExpanded] = useState(false);
 
@@ -641,13 +641,13 @@ const LessonViewer = () => {
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">
                                     <div className="p-6 border-b border-slate-100 bg-white/80 backdrop-blur-md z-10">
                                         <TabsList className="grid grid-cols-3 gap-3 w-full h-[60px] bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                                            <TabsTrigger value="3d" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
-                                                <Cuboid className="w-4 h-4 mr-2" />
-                                                <span>3D</span>
-                                            </TabsTrigger>
                                             <TabsTrigger value="fayllar" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
                                                 <FileText className="w-4 h-4 mr-2" />
                                                 <span>Fayllar</span>
+                                            </TabsTrigger>
+                                            <TabsTrigger value="3d" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
+                                                <Cuboid className="w-4 h-4 mr-2" />
+                                                <span>3D</span>
                                             </TabsTrigger>
                                             <TabsTrigger value="chat" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
                                                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -657,24 +657,6 @@ const LessonViewer = () => {
                                     </div>
 
                                     <div className="flex-1 p-0 overflow-hidden">
-                                        <TabsContent value="3d" className="m-0 h-full flex flex-col p-6">
-                                            {(lesson.model3dUrl || lesson.interactiveUrl) ? (
-                                                <div className="flex-1 w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-inner relative group">
-                                                    <ModelViewer model={{ url: getFileUrl(lesson.model3dUrl || lesson.interactiveUrl) }} />
-                                                    <div className="absolute top-4 left-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none font-bold text-[10px] px-3 py-1 rounded-lg">
-                                                            3D ENGINE v2.0
-                                                        </Badge>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center h-full text-slate-300 py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
-                                                    <Cuboid className="w-16 h-16 mb-4 opacity-10" />
-                                                    <p className="font-black text-xs uppercase tracking-widest">Model mavjud emas</p>
-                                                </div>
-                                            )}
-                                        </TabsContent>
-
                                         <TabsContent value="fayllar" className="m-0 space-y-4 p-6 overflow-y-auto custom-scrollbar">
                                             <div className="space-y-3">
                                                 {/* Multi-document support (new) */}
@@ -735,6 +717,24 @@ const LessonViewer = () => {
                                                     </div>
                                                 )}
                                             </div>
+                                        </TabsContent>
+
+                                        <TabsContent value="3d" className="m-0 h-full flex flex-col p-6">
+                                            {(lesson.model3dUrl || lesson.interactiveUrl) ? (
+                                                <div className="flex-1 w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-inner relative group">
+                                                    <ModelViewer model={{ url: getFileUrl(lesson.model3dUrl || lesson.interactiveUrl) }} />
+                                                    <div className="absolute top-4 left-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Badge className="bg-white/90 backdrop-blur-md text-slate-900 border-none font-bold text-[10px] px-3 py-1 rounded-lg">
+                                                            3D ENGINE v2.0
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center h-full text-slate-300 py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                                                    <Cuboid className="w-16 h-16 mb-4 opacity-10" />
+                                                    <p className="font-black text-xs uppercase tracking-widest">Model mavjud emas</p>
+                                                </div>
+                                            )}
                                         </TabsContent>
 
                                         <TabsContent value="chat" className="m-0 h-full flex flex-col p-6 overflow-hidden">
