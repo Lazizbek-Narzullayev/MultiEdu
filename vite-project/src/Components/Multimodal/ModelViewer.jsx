@@ -48,8 +48,12 @@ class ModelErrorBoundary extends React.Component {
 const GlbModel = ({ url }) => {
     // This will fetch the model, parse it, and cache it.
     // Throws errors to the closest ErrorBoundary if it fails.
-    const normalizedUrl = url.replace(/\\\\/g, '/');
+    let normalizedUrl = url.replace(/\\\\/g, '/');
+    if (normalizedUrl.includes('RobotExpressive') && normalizedUrl.includes('KhronosGroup')) {
+        normalizedUrl = 'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb';
+    }
     const { scene } = useGLTF(normalizedUrl, true);
+    return <primitive object={scene} />;
 };
 
 // Simplified Loading Spinner integrated inside the 3D Canvas (Fixes the setState render collision with EnvironmentCube)

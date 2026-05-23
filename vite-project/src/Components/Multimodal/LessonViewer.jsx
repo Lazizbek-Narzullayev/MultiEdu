@@ -640,17 +640,17 @@ const LessonViewer = () => {
                             <div className="bg-white border border-slate-200 rounded-[3rem] flex-1 flex flex-col shadow-sm overflow-hidden relative">
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden">
                                     <div className="p-6 border-b border-slate-100 bg-white/80 backdrop-blur-md z-10">
-                                        <TabsList className="grid grid-cols-3 gap-3 w-full h-[60px] bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                                            <TabsTrigger value="fayllar" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
-                                                <FileText className="w-4 h-4 mr-2" />
+                                        <TabsList className="grid grid-cols-3 gap-1.5 sm:gap-3 w-full h-[52px] sm:h-[60px] bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                                            <TabsTrigger value="fayllar" className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all px-2 sm:px-3">
+                                                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />
                                                 <span>Fayllar</span>
                                             </TabsTrigger>
-                                            <TabsTrigger value="3d" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
-                                                <Cuboid className="w-4 h-4 mr-2" />
+                                            <TabsTrigger value="3d" className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all px-2 sm:px-3" disabled={!lesson.model3dUrl && !lesson.interactiveUrl}>
+                                                <Cuboid className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />
                                                 <span>3D</span>
                                             </TabsTrigger>
-                                            <TabsTrigger value="chat" className="rounded-xl text-xs font-black uppercase tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all">
-                                                <MessageCircle className="w-4 h-4 mr-2" />
+                                            <TabsTrigger value="chat" className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest h-full data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-md border border-transparent data-[state=active]:border-slate-100 transition-all px-2 sm:px-3">
+                                                <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />
                                                 <span>Chat</span>
                                             </TabsTrigger>
                                         </TabsList>
