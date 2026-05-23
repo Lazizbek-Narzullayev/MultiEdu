@@ -386,14 +386,24 @@ const LessonForm = ({ courseId = null, onComplete = null }) => {
                                             )}
                                             <AnimatePresence>
                                                 {documents.map((doc, idx) => (
-                                                    <motion.div key={idx} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 20 }} className="flex items-center gap-3 p-4 bg-background border border-border rounded-2xl">
-                                                        <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                                                    <motion.div key={idx} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 20 }} className="flex items-center gap-2 p-3 bg-background border border-border rounded-2xl overflow-hidden">
+                                                        <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
                                                             <FileText className="w-4 h-4" />
                                                         </div>
-                                                        <input className="w-28 shrink-0 bg-transparent text-sm font-bold outline-none border-b border-transparent hover:border-border focus:border-primary transition-colors" placeholder="Nomi..." value={doc.name} onChange={(e) => { const u = [...documents]; u[idx].name = e.target.value; setDocuments(u); }} />
-                                                        <input className="flex-1 bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-primary" placeholder="URL manzili..." value={doc.url} onChange={(e) => { const u = [...documents]; u[idx].url = e.target.value; setDocuments(u); }} />
-                                                        <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0" onClick={() => setDocuments(documents.filter((_, i) => i !== idx))}>
-                                                            <Trash2 className="w-4 h-4" />
+                                                        <input
+                                                            className="w-24 shrink-0 bg-transparent text-xs font-bold outline-none border-b border-transparent hover:border-border focus:border-primary transition-colors truncate"
+                                                            placeholder="Nomi..."
+                                                            value={doc.name}
+                                                            onChange={(e) => { const u = [...documents]; u[idx].name = e.target.value; setDocuments(u); }}
+                                                        />
+                                                        <input
+                                                            className="flex-1 min-w-0 bg-muted/50 border border-border rounded-xl px-2 py-1.5 text-[11px] outline-none focus:ring-1 focus:ring-primary truncate"
+                                                            placeholder="URL manzili..."
+                                                            value={doc.url}
+                                                            onChange={(e) => { const u = [...documents]; u[idx].url = e.target.value; setDocuments(u); }}
+                                                        />
+                                                        <Button variant="ghost" size="icon" className="w-7 h-7 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0" onClick={() => setDocuments(documents.filter((_, i) => i !== idx))}>
+                                                            <Trash2 className="w-3.5 h-3.5" />
                                                         </Button>
                                                     </motion.div>
                                                 ))}
