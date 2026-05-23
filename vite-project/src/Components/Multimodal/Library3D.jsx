@@ -42,7 +42,7 @@ const PUBLIC_MODELS = [
         title: 'Zamonaviy Laptop Kompyuter',
         category: 'arkitektura',
         type: 'glb',
-        url: 'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        url: 'https://vazxmixjsiaqpjt3cdfz.supabase.co/storage/v1/object/public/models/macbook/model.gltf',
         thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80',
         description: 'Zamonaviy kompyuter va IT texnologiyalari – raqamli asrning asosi.'
     },
@@ -69,7 +69,7 @@ const PUBLIC_MODELS = [
         title: 'Blockchain va Kriptovalyuta',
         category: 'xavfsizlik',
         type: 'glb',
-        url: 'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
         thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80',
         description: 'Bitcoin va blockchain texnologiyasi – kriptografik himoya va desentralizatsiya.'
     },
@@ -78,7 +78,7 @@ const PUBLIC_MODELS = [
         title: 'Kripto Tokenlar va Raqamli Aktivlar',
         category: 'xavfsizlik',
         type: 'glb',
-        url: 'https://threejs.org/examples/models/gltf/Duck/glTF-Binary/Duck.glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb',
         thumbnail: 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=600&q=80',
         description: 'Raqamli aktivlar, NFT va kripto tokenlar dunyosiga kirish.'
     },
@@ -99,6 +99,24 @@ const PUBLIC_MODELS = [
         url: 'https://www.youtube.com/embed/VuHC0bI7Fag',
         thumbnail: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&q=80',
         description: 'Zamonaviy shahar panoramasi – 360 darajali virtual sayohat.'
+    },
+    {
+        id: 'iss-360-tech',
+        title: 'ISS Fazo Stansiyasi (VR Tajriba)',
+        category: 'vr',
+        type: 'vr',
+        url: 'https://www.youtube.com/embed/2Ozlokw5f2M',
+        thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80',
+        description: 'Xalqaro fazo stansiyasining 360 darajali texnologik sayohati.'
+    },
+    {
+        id: 'astronaut-vr',
+        title: 'Koinot Sayohati – 360° VR',
+        category: 'vr',
+        type: 'vr',
+        url: 'https://www.youtube.com/embed/FG0fTKAqZ5g',
+        thumbnail: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=600&q=80',
+        description: 'Koinot fazoSida 360 darajali virtual sayohat tajribasi.'
     },
     {
         id: 'uber-taxi',
@@ -132,7 +150,7 @@ const PUBLIC_MODELS = [
         title: 'Kiberxavfsizlik va Ma\'lumotlarni Himoya',
         category: 'xavfsizlik',
         type: 'glb',
-        url: 'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
         thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80',
         description: 'Kiberxavfsizlik – tizimlarni himoya qilish, hujumlarni oldini olish strategiyalari.'
     },
@@ -146,29 +164,11 @@ const PUBLIC_MODELS = [
         description: 'Internet of Things – aqlli uy qurilmalari va masofadan boshqarish.'
     },
     {
-        id: 'iss-360-tech',
-        title: 'ISS Fazo Stansiyasi (VR Tajriba)',
-        category: 'vr',
-        type: 'vr',
-        url: 'https://www.youtube.com/embed/2Ozlokw5f2M',
-        thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80',
-        description: 'Xalqaro fazo stansiyasining 360 darajali texnologik sayohati.'
-    },
-    {
-        id: 'astronaut-vr',
-        title: 'Koinot Sayohati – 360° VR',
-        category: 'vr',
-        type: 'vr',
-        url: 'https://www.youtube.com/embed/FG0fTKAqZ5g',
-        thumbnail: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=600&q=80',
-        description: 'Koinot fazoSida 360 darajali virtual sayohat tajribasi.'
-    },
-    {
         id: 'tech-engine',
         title: 'Muhandislik va Sanoat Texnikasi',
         category: 'texnika',
         type: 'glb',
-        url: 'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
         thumbnail: 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=600&q=80',
         description: 'Muhandislik, mexanika va sanoat texnikasining 3D vizualizatsiyasi.'
     },

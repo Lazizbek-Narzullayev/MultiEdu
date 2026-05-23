@@ -178,7 +178,7 @@ const LogIn = () => {
             
             <div className="space-y-6">
                 <h2 className="text-5xl font-black text-white leading-tight tracking-tight">
-                    Bilimlar Olami Siz Uchun <span className="text-primary">Ochiq.</span>
+                    Raqamli texnologiyalar va <span className="text-primary">innovatsiyalar</span>
                 </h2>
                 <p className="text-slate-400 text-xl font-medium max-w-lg mx-auto leading-relaxed">
                     AI Tutor, 3D vizualizatsiya va eng zamonaviy kurslar bilan kelajakni bugundan yarating.
