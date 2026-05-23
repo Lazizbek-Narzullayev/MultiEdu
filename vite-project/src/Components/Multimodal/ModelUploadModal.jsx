@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config/apiConfig';
 
@@ -56,6 +57,14 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
         if (e.target.files[0]) {
             setThumbFile(e.target.files[0]);
         }
+    };
+
+    const handleRemoveFile = () => {
+        setFile(null);
+    };
+
+    const handleRemoveThumb = () => {
+        setThumbFile(null);
     };
 
     const handleSubmit = async () => {
@@ -172,9 +181,21 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
                                 GLB/GLTF/DLS fayl tanlash
                             </Button>
                         </label>
+                        {file && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                                <Typography variant="caption" sx={{ flexGrow: 1, fontSize: '0.75rem' }}>
+                                    {`Tanlandi: ${file.name}`}
+                                </Typography>
+                                <IconButton size="small" onClick={handleRemoveFile} aria-label="Remove file">
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        )}
+                        !file && (
                         <Typography variant="caption" display="block">
-                            {file ? `Tanlandi: ${file.name}` : 'Maksimal hajm: 50MB'}
+                            {'Maksimal hajm: 50MB'}
                         </Typography>
+                        )
                     </Box>
 
                     <Box sx={{ border: '2px dashed #e2e8f0', p: 3, borderRadius: 2, textAlign: 'center' }}>
