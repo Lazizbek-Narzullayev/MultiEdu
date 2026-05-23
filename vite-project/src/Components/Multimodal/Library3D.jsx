@@ -29,69 +29,169 @@ import { API_BASE_URL } from '../../config/apiConfig';
 
 // Verified 100% Stable and Fast-Loading 3D Models Library
 const PUBLIC_MODELS = [
+    // 1. Zamonaviy Kompyuter / IT texnologiyalar
     {
-        id: 'astronaut-space',
-        title: 'Astronavt Koinotda',
-        category: 'texnika',
+        id: 'modern-laptop',
+        title: 'Zamonaviy Laptop Kompyuter',
+        category: 'arkitektura',
         type: 'glb',
-        url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80',
-        description: 'Eng mashhur koinot astronavtining to\'liq interaktiv 3D modeli.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80',
+        description: 'Zamonaviy kompyuter va IT texnologiyalari – raqamli asrning asosi.'
     },
     {
-        id: 'blockchain-core',
-        title: 'Blockchain va Kripto-Xavfsizlik',
+        id: 'robot-tech',
+        title: 'Robototexnika va Kompyuter Arxitekturasi',
+        category: 'arkitektura',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/RobotExpressive/glTF-Binary/RobotExpressive.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80',
+        description: 'Kompyuter arxitekturasi va robototexnika: CPU, xotira va qurilmalar tizimi.'
+    },
+
+    // 2. Cloud – Bulutli texnologiyalar
+    {
+        id: 'cloud-server',
+        title: 'Server va Bulutli Hisoblash',
+        category: 'tarmoq',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80',
+        description: 'Bulutli hisoblash va serverlar – ma\'lumotlarni saqlash va uzatish infratuzilmasi.'
+    },
+    {
+        id: 'astronaut-space',
+        title: 'Astronavt – Koinotdagi Texnologiyalar',
+        category: 'tarmoq',
+        type: 'glb',
+        url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+        description: 'Koinot texnologiyalari va sun\'iy yo\'ldoshlar orqali bulutli ma\'lumot uzatish.'
+    },
+
+    // 3. Bitcoin / Kriptovalyuta / Blockchain
+    {
+        id: 'blockchain-security',
+        title: 'Blockchain va Kriptovalyuta',
         category: 'xavfsizlik',
         type: 'glb',
         url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
         thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=600&q=80',
-        description: 'Kriptografik xavfsizlik va blockchain bloklari himoyasi (Shlem).'
+        description: 'Bitcoin va blockchain texnologiyasi – kriptografik himoya va desentralizatsiya.'
     },
     {
-        id: 'tech-innovation',
-        title: 'Raqamli Innovatsiyalar (Flight Helmet)',
-        category: 'texnika',
+        id: 'crypto-duck',
+        title: 'Kripto Tokenlar va Raqamli Aktivlar',
+        category: 'xavfsizlik',
         type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=600&q=80',
-        description: 'Aviatsiya va raqamli innovatsiyalar shlemining 3D vizualizatsiyasi.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Duck/glTF-Binary/Duck.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=600&q=80',
+        description: 'Raqamli aktivlar, NFT va kripto tokenlar dunyosiga kirish.'
     },
+
+    // 4. Shahar / Transport infratuzilmasi
     {
-        id: 'iot-smart-lantern',
-        title: 'IoT va Aqlli Yoritish Qurilmasi',
-        category: 'ai',
+        id: 'city-car',
+        title: 'Zamonaviy Avtomobil (Shahar Transporti)',
+        category: 'transport',
         type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
-        description: 'Internet buyumlari orqali masofaviy boshqariladigan aqlli chiroq qurilmasi.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80',
+        description: 'Shahar transporti va infratuzilmasi – zamonaviy avtomobillar va yo\'llar tizimi.'
     },
     {
-        id: 'cyber-organic',
-        title: 'Kiber-Organik Tizimlar (Brain Stem)',
+        id: 'iss-city-tour',
+        title: 'Shahar Panoramasi (360° VR Sayohat)',
+        category: 'transport',
+        type: 'vr',
+        url: 'https://www.youtube.com/embed/VuHC0bI7Fag',
+        thumbnail: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&q=80',
+        description: 'Zamonaviy shahar panoramasi – 360 darajali virtual sayohat.'
+    },
+
+    // 5. Uber / Taxi / Sharing ekonomika
+    {
+        id: 'uber-taxi',
+        title: 'Taxi va Ride-Sharing Xizmatlari',
+        category: 'transport',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=600&q=80',
+        description: 'Uber, Yandex Taxi va ride-sharing – texnologiya orqali transport xizmatlari.'
+    },
+
+    // 6. Sun'iy intellekt / AI
+    {
+        id: 'ai-brain',
+        title: 'Sun\'iy Intellekt – Neyron Tarmog\'i',
         category: 'ai',
         type: 'glb',
         url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/BrainStem/glTF-Binary/BrainStem.glb',
         thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=600&q=80',
-        description: 'Inson miya nerv tizimlari va biologik kiber-organika modeli.'
+        description: 'Sun\'iy intellekt va neyron tarmoqlari – mashinalar o\'qishining vizualizatsiyasi.'
     },
     {
-        id: 'premium-duck',
-        title: 'Innovatsion 3D Sariq O\'rdak',
-        category: 'texnika',
+        id: 'ai-robot',
+        title: 'AI Robot – Aqlli Tizimlar',
+        category: 'ai',
         type: 'glb',
-        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Duck/glTF-Binary/Duck.glb',
-        thumbnail: 'https://images.unsplash.com/photo-1559811814-e2c57b5e69df?auto=format&fit=crop&w=600&q=80',
-        description: 'Eng mashhur va o\'ta yengil 3D o\'yinchoq o\'rdak modeli.'
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/RobotExpressive/glTF-Binary/RobotExpressive.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80',
+        description: 'Aqlli robotlar va avtomatlashtirilgan tizimlar – AI ning haqiqiy dunyodagi qo\'llanilishi.'
     },
+
+    // 7. Kiberxavfsizlik
+    {
+        id: 'cyber-helmet',
+        title: 'Kiberxavfsizlik va Ma\'lumotlarni Himoya',
+        category: 'xavfsizlik',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/FlightHelmet/glTF-Binary/FlightHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80',
+        description: 'Kiberxavfsizlik – tizimlarni himoya qilish, hujumlarni oldini olish strategiyalari.'
+    },
+
+    // 8. IoT / Aqlli uy
+    {
+        id: 'iot-smart-lantern',
+        title: 'IoT va Aqlli Uy Texnologiyalari',
+        category: 'ai',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Lantern/glTF-Binary/Lantern.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
+        description: 'Internet of Things – aqlli uy qurilmalari va masofadan boshqarish.'
+    },
+
+    // 9. VR / AR texnologiyalar
     {
         id: 'iss-360-tech',
         title: 'ISS Fazo Stansiyasi (VR Tajriba)',
         category: 'vr',
         type: 'vr',
         url: 'https://www.youtube.com/embed/2Ozlokw5f2M',
-        thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
+        thumbnail: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80',
         description: 'Xalqaro fazo stansiyasining 360 darajali texnologik sayohati.'
-    }
+    },
+    {
+        id: 'astronaut-vr',
+        title: 'Koinot Sayohati – 360° VR',
+        category: 'vr',
+        type: 'vr',
+        url: 'https://www.youtube.com/embed/FG0fTKAqZ5g',
+        thumbnail: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?auto=format&fit=crop&w=600&q=80',
+        description: 'Koinot fazoSida 360 darajali virtual sayohat tajribasi.'
+    },
+
+    // 10. Texnika / Muhandislik
+    {
+        id: 'tech-engine',
+        title: 'Muhandislik va Sanoat Texnikasi',
+        category: 'texnika',
+        type: 'glb',
+        url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        thumbnail: 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=600&q=80',
+        description: 'Muhandislik, mexanika va sanoat texnikasining 3D vizualizatsiyasi.'
+    },
 ];
 
 const Library3D = ({ onSelectModel }) => {
@@ -184,6 +284,7 @@ const Library3D = ({ onSelectModel }) => {
                 <Tab label="Tarmoqlar va Serverlar" value="tarmoq" />
                 <Tab label="Sun'iy Intellekt" value="ai" />
                 <Tab label="Kiberxavfsizlik" value="xavfsizlik" />
+                <Tab label="Transport va Shahar" value="transport" />
                 <Tab label="Biologiya" value="biologiya" />
                 <Tab label="Astronomiya" value="astronomiya" />
                 <Tab label="Texnika va Sanoat" value="texnika" />
