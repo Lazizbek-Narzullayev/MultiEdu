@@ -33,8 +33,8 @@ class ModelErrorBoundary extends React.Component {
 const GlbModel = ({ url }) => {
     // This will fetch the model, parse it, and cache it.
     // Throws errors to the closest ErrorBoundary if it fails.
-    const { scene } = useGLTF(url, true);
-    return <primitive object={scene} />;
+    const normalizedUrl = url.replace(/\\\\/g, '/');
+    const { scene } = useGLTF(normalizedUrl, true);
 };
 
 // Simplified Loading Spinner integrated inside the 3D Canvas (Fixes the setState render collision with EnvironmentCube)
@@ -71,6 +71,11 @@ const ModelViewer = ({ model }) => {
     }, []);
 
     if (!url) return null;
+
+    // Reset error state when URL changes
+    React.useEffect(() => {
+        setHasError(false);
+    }, [url]);
 
     let type = model.type;
     if (!type) {
