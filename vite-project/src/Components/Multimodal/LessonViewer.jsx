@@ -28,6 +28,22 @@ const getFileUrl = (path) => {
     return `${baseServerUrl}${cleanPath}`;
 };
 
+const getFileExtension = (url) => {
+    if (!url) return 'FAYL';
+    try {
+        const cleanUrl = url.split(/[?#]/)[0];
+        const filename = cleanUrl.substring(cleanUrl.lastIndexOf('/') + 1);
+        const parts = filename.split('.');
+        if (parts.length > 1) {
+            const ext = parts.pop().toUpperCase();
+            if (ext.length <= 5 && /^[A-Z0-9]+$/.test(ext)) {
+                return ext;
+            }
+        }
+    } catch (e) {}
+    return 'FAYL';
+};
+
 const LessonViewer = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -184,6 +200,23 @@ const LessonViewer = () => {
 
     const [isVideoStarted, setIsVideoStarted] = useState(false);
     const [isPlayerReady, setIsPlayerReady] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+
+    const toggleMute = () => {
+        if (playerRef.current) {
+            try {
+                if (isMuted) {
+                    playerRef.current.unMute();
+                    setIsMuted(false);
+                } else {
+                    playerRef.current.mute();
+                    setIsMuted(true);
+                }
+            } catch (e) {
+                console.error("Mute toggle error:", e);
+            }
+        }
+    };
 
     const onPlayerReady = (event) => {
         setDuration(event.target.getDuration());
@@ -361,6 +394,7 @@ const LessonViewer = () => {
             try {
                 playerRef.current.unMute();
                 playerRef.current.setVolume(100);
+                setIsMuted(false);
                 playerRef.current.seekTo(0);
                 playerRef.current.playVideo();
             } catch (e) {
@@ -372,6 +406,7 @@ const LessonViewer = () => {
                     try {
                         playerRef.current.unMute();
                         playerRef.current.setVolume(100);
+                        setIsMuted(false);
                         playerRef.current.seekTo(0);
                         playerRef.current.playVideo();
                     } catch (e) {}
@@ -465,6 +500,9 @@ const LessonViewer = () => {
                                     <div className="flex items-center gap-3">
                                         <button onClick={() => isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo()} className="text-white hover:scale-110 transition-transform">
                                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+                                        </button>
+                                        <button onClick={toggleMute} className="text-white hover:scale-110 transition-transform" title={isMuted ? "Ovozni yoqish" : "Ovozni o'chirish"}>
+                                            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                                         </button>
                                         <div className="flex-1 h-1.5 bg-white/20 rounded-full relative overflow-hidden">
                                             <div 
@@ -648,7 +686,7 @@ const LessonViewer = () => {
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-black text-xs text-slate-900 truncate">{doc.name || 'Hujjat'}</p>
                                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                                                                {doc.url?.split('.').pop()?.toUpperCase() || 'FAYL'}
+                                                                {getFileExtension(doc.url)}
                                                             </p>
                                                         </div>
                                                         <Button size="sm" variant="ghost" className="h-8 rounded-lg font-black text-[9px] uppercase tracking-widest hover:text-rose-500" onClick={() => window.open(getFileUrl(doc.url))}>

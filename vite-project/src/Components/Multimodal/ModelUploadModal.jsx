@@ -182,20 +182,20 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
                             </Button>
                         </label>
                         {file && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                                <Typography variant="caption" sx={{ flexGrow: 1, fontSize: '0.75rem' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 0.5 }}>
+                                <Typography variant="caption" sx={{ fontSize: '0.75rem', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {`Tanlandi: ${file.name}`}
                                 </Typography>
-                                <IconButton size="small" onClick={handleRemoveFile} aria-label="Remove file">
+                                <IconButton size="small" onClick={handleRemoveFile} aria-label="Remove file" color="error">
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
-                        !file && (
-                        <Typography variant="caption" display="block">
-                            {'Maksimal hajm: 50MB'}
-                        </Typography>
-                        )
+                        {!file && (
+                            <Typography variant="caption" display="block">
+                                {'Maksimal hajm: 50MB'}
+                            </Typography>
+                        )}
                     </Box>
 
                     <Box sx={{ border: '2px dashed #e2e8f0', p: 3, borderRadius: 2, textAlign: 'center' }}>
@@ -216,9 +216,21 @@ const ModelUploadModal = ({ open, onClose, onUploadSuccess }) => {
                                 Muqova (Thumbnail) tanlash
                             </Button>
                         </label>
-                        <Typography variant="caption" display="block">
-                            {thumbFile ? `Tanlandi: ${thumbFile.name}` : 'Rasm fayli (JPG, PNG)'}
-                        </Typography>
+                        {thumbFile && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 0.5 }}>
+                                <Typography variant="caption" sx={{ fontSize: '0.75rem', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {`Tanlandi: ${thumbFile.name}`}
+                                </Typography>
+                                <IconButton size="small" onClick={handleRemoveThumb} aria-label="Remove thumbnail" color="error">
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        )}
+                        {!thumbFile && (
+                            <Typography variant="caption" display="block">
+                                {'Rasm fayli (JPG, PNG)'}
+                            </Typography>
+                        )}
                     </Box>
                 </Box>
             </DialogContent>
